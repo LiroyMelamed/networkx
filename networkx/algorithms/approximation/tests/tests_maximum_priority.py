@@ -1,5 +1,5 @@
 import networkx as nx
-from networkx import Maximum_Priority_Matching
+from networkx.networkx.algorithms.approximation import maximum_priority_matching
 
 '''
 Testing file for Maximum Priority Matching
