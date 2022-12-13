@@ -1,6 +1,5 @@
 import networkx as nx
 from networkx.networkx.algorithms.approximation import maximum_priority_matching
-
 '''
 Testing file for Maximum Priority Matching
 
@@ -38,7 +37,7 @@ def test_score():
     G.add_edge("f", "i")
     G.add_edge("f", "g")
     G.add_edge("f", "j")
-    assert Maximum_Priority_Matching.find_priority_score(G) == "2111000100"
+    assert maximum_priority_matching.find_priority_score(G) == "2111000100"
 
 
 def test_two_priority():
@@ -57,7 +56,7 @@ def test_two_priority():
     attrs = {("a", "b"): {"Matched": False}, ("b", "c"): {"Matched": True}, ("c", "d"): {"Matched": False},
              ("d", "e"): {"Matched": True}, ("e", "f"): {"Matched": False}}
     nx.set_edge_attributes(G, attrs)
-    assert Maximum_Priority_Matching.two_priority_augmenthing_path(G, ["a", "b", "c", "d", "e", "f"]) == [("a", "b"),
+    assert maximum_priority_matching.two_priority_augmenthing_path(G, ["a", "b", "c", "d", "e", "f"]) == [("a", "b"),
                                                                                                           ("c", "d"),
                                                                                                           ("e", "f")]
 
@@ -97,7 +96,7 @@ def test_find_augmenting_path():
     attrs = {("b", "e"): {"Matched": True}, ("c", "f"): {"Matched": True}, ("h", "j"): {"Matched": True},
              ("k", "n"): {"Matched": True}, ("m", "p"): {"Matched": True}}
     nx.set_edge_attributes(G, attrs)
-    assert Maximum_Priority_Matching.find_augmenting_path(G, ["a", "b"]) == "g -> h -> j -> k -> n"
+    assert maximum_priority_matching.find_augmenting_path(G, ["a", "b"]) == "g -> h -> j -> k -> n"
 
 
 def test_blossom_augmenting_path():
@@ -129,11 +128,13 @@ def test_blossom_augmenting_path():
     G.add_edge("j", "k")
     G.add_edge("j", "m")
     G.add_edge("k", "m")
-    assert Maximum_Priority_Matching.blossom_augmenting_path(G, ["a", "h"]) == "a -> b -> c -> f -> g -> e -> d"
+    assert maximum_priority_matching.blossom_augmenting_path(G, ["a", "h"]) == "a -> b -> c -> f -> g -> e -> d"
 
-
-if __name__ == '__main__':
+def call_all_function():
     test_score()
     test_two_priority()
     test_find_augmenting_path()
     test_blossom_augmenting_path()
+
+if __name__ == '__main__':
+    call_all_function()
