@@ -58,7 +58,6 @@ def find_priority_score(G: nx.Graph):
     score = ""
     return score
 
-
 def find_maximum_priority_matching(G: nx.Graph()):
     '''
         " We describe a variation of the augmenting path method (Edmonds’ algorithm) that
@@ -167,25 +166,25 @@ def increase_priority_martching(G: nx.Graph, Priority: int):
 
         Tests:
         >>> ans = nx.Graph()
-        >>> G.add_node("a")
-        >>> G.add_node("b")
-        >>> G.add_node("c")
-        >>> G.add_node("d")
-        >>> G.add_node("e")
-        >>> G.add_node("f")
-        >>> G.add_node("g")
-        >>> G.add_node("h")
-        >>> G.add_node("i")
-        >>> nx.set_node_attributes(G, {"a": 1, "b": 8, "c": 6, "d": 5, "e": 2, "f": 4, "g": 3, "h": 1, "i":7}, name="priority")
-        >>> G.add_edge("a","b")
-        >>> G.add_edge("b","c")
-        >>> G.add_edge("c","d")
-        >>> G.add_edge("d","e")
-        >>> G.add_edge("e","f")
-        >>> G.add_edge("f","g")
-        >>> G.add_edge("g","h")
-        >>> G.add_edge("g","i")
-        >>> G.add_edge("g","c")
+        >>> ans.add_node("a")
+        >>> ans.add_node("b")
+        >>> ans.add_node("c")
+        >>> ans.add_node("d")
+        >>> ans.add_node("e")
+        >>> ans.add_node("f")
+        >>> ans.add_node("g")
+        >>> ans.add_node("h")
+        >>> ans.add_node("i")
+        >>> nx.set_node_attributes(ans, {"a": 1, "b": 8, "c": 6, "d": 5, "e": 2, "f": 4, "g": 3, "h": 1, "i":7}, name="priority")
+        >>> ans.add_edge("a","b")
+        >>> ans.add_edge("b","c")
+        >>> ans.add_edge("c","d")
+        >>> ans.add_edge("d","e")
+        >>> ans.add_edge("e","f")
+        >>> ans.add_edge("f","g")
+        >>> ans.add_edge("g","h")
+        >>> ans.add_edge("g","i")
+        >>> ans.add_edge("g","c")
         >>> attrs = {("a", "b"): {"Matched": True}, ("d", "e"): {"Matched": True}, ("g", "h"): {"Matched": True}}
 
 
@@ -215,6 +214,96 @@ def increase_priority_martching(G: nx.Graph, Priority: int):
     '''
     ans = nx.Graph()
     return ans
+
+def find_maximum_priority_matching_bipartite(G: nx.Graph):
+    '''
+        "Faster Maximium Priority Matchings in Bipartite Graphs" by Tarjan, Robert E.
+
+        Programmers: Roi Meshulam and Liroy Melamed
+
+        Our find_maximum_priority_matching_bipartite gets bipartite graph and returns the maximum priority matching
+
+        :param G: nx.Graph
+        :return: A list of edges
+
+        Tests:
+
+        >>> G = nx.Graph()
+        >>> G.add_node("a")
+        >>> G.add_node("b")
+        >>> G.add_node("c")
+        >>> G.add_node("d")
+        >>> G.add_node("e")
+        >>> G.add_node("f")
+        >>> nx.set_node_attributes(G, {"a": 1, "b": 3, "c": 2, "d": 4, "e": 5, "f": 6}, name="priority")
+        >>> G.add_edge("a","b")
+        >>> G.add_edge("a","d")
+        >>> G.add_edge("c","f")
+        >>> G.add_edge("e","f")
+        >>> attrs = {("a", "d"): {"Matched": True}, ("e", "f"): {"Matched": True}}
+        >>> find_maximum_priority_matching_bipartite(G)
+        [(a,b),(c,f)]
+    '''
+    matching = []
+    return matching
+
+
+
+
+
+
+
+def increase_priority_martching_bipartite(G: nx.Graph, Priority: int):
+    '''
+        "Faster Maximium Priority Matchings in Bipartite Graphs" by Tarjan, Robert E.
+
+        Programmers: Roi Meshulam and Liroy Melamed
+
+        Our increase_priority_martching_bipartite gets bipartite graph and priority and return the update graph with matching that
+        maximize the number of priority Priority vertices that are matched
+
+        :param G: nx.Graph
+        :param Priority: integer
+        :return: Update graph
+
+        Tests:
+        >>> ans = nx.Graph()
+        >>> ans.add_node("a")
+        >>> ans.add_node("b")
+        >>> ans.add_node("c")
+        >>> ans.add_node("d")
+        >>> ans.add_node("e")
+        >>> ans.add_node("f")
+        >>> nx.set_node_attributes(ans, {"a": 1, "b": 3, "c": 2, "d": 4, "e": 5, "f": 6}, name="priority")
+        >>> ans.add_edge("a","b")
+        >>> ans.add_edge("a","d")
+        >>> ans.add_edge("c","f")
+        >>> ans.add_edge("e","f")
+        >>> attrs = {("a", "d"): {"Matched": True}, ("c", "f"): {"Matched": True}}
+
+
+        >>> G = nx.Graph()
+        >>> G.add_node("a")
+        >>> G.add_node("b")
+        >>> G.add_node("c")
+        >>> G.add_node("d")
+        >>> G.add_node("e")
+        >>> G.add_node("f")
+        >>> nx.set_node_attributes(G, {"a": 1, "b": 3, "c": 2, "d": 4, "e": 5, "f": 6}, name="priority")
+        >>> G.add_edge("a","b")
+        >>> G.add_edge("a","d")
+        >>> G.add_edge("c","f")
+        >>> G.add_edge("e","f")
+        >>> attrs = {("a", "d"): {"Matched": True}, ("e", "f"): {"Matched": True}}
+        >>> increase_priority_martching_bipartite(G,2)
+        ans
+    '''
+    ans = nx.Graph()
+    return ans
+
+
+
+
 
 
 
