@@ -5,7 +5,7 @@ import networkx as nx
 
 def find_priority_score(G: nx.Graph):
     '''
-    "The bounded edge coloring problem and offline crossbar scheduling" by Turner, Jonathan S.
+    "The bounded edge coloring problem and offline crossbar scheduling" by Turner, Jonathan S..
 
     Programmers: Roi Meshulam and Liroy Melamed
 
