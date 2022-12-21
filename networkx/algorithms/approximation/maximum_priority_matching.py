@@ -5,15 +5,15 @@ import networkx as nx
 
 def find_priority_score(G: nx.Graph):
     '''
-    "The bounded edge coloring problem and offline crossbar scheduling" by Turner, Jonathan S..
+    "The bounded edge coloring problem and offline crossbar scheduling" by Turner, Jonathan S.
 
     Programmers: Roi Meshulam and Liroy Melamed
 
-    Our find_priority_score gets graph and returns a maximum priority score string
+    Our find_priority_score gets graph and returns the current priority score as a string
     This Function gets the base class for undirected graphs.
 
     :param G: nx.Graph
-    :return: Maximun priority matching score
+    :return: A string represent the current priority matching score
 
     Tests:
     >>> G = nx.Graph()
@@ -58,151 +58,166 @@ def find_priority_score(G: nx.Graph):
     score = ""
     return score
 
-def two_priority_augmenthing_path(G, nbunch: list):
+
+def find_maximum_priority_matching(G: nx.Graph()):
     '''
-    "Paths, trees and flowers" by Edmonds, Jack.
+        " We describe a variation of the augmenting path method (Edmonds’ algorithm) that
+        finds a matching with maximum priority score in O(mn) time." by Turner, Jonathan S.
 
-    Programmers: Roi Meshulam and Liroy Melamed
+        Programmers: Roi Meshulam and Liroy Melamed
 
-    Our two_priority_augmenthing_path function gets a graph and returns an augmenting path by testing switching the matching in the given subgraph
-    The nbunch variable is a list that contains nodes of the subgraph
+        Our find_maximum_priority_matching gets graph and returns the maximum priority matching as a set of edges.
 
-    Tests:
-    >>> G = nx.Graph()
-    >>> G.add_node("a")
-    >>> G.add_node("b")
-    >>> G.add_node("c")
-    >>> G.add_node("d")
-    >>> G.add_node("e")
-    >>> G.add_node("f")
-    >>> G.add_edge("a","b")
-    >>> G.add_edge("b","c")
-    >>> G.add_edge("c","d")
-    >>> G.add_edge("d","e")
-    >>> G.add_edge("e","f")
-    >>> attrs = {("a", "b"): {"Matched": False}, ("b", "c"): {"Matched": True}, ("c", "d"): {"Matched": False}, ("d","e"): {"Matched": True}, ("e","f"): {"Matched": False}}
-    >>> nx.set_edge_attributes(G, attrs)
-    >>> two_priority_augmenthing_path(G, ["a","b","c","d","e","f"])
-    [(a,b),(c,d),(e,f)]
+        :param G: nx.Graph
+        :return: A list of edges
 
-    >>> G = nx.Graph()
-    >>> G.add_node("a")
-    >>> G.add_node("b")
-    >>> G.add_node("c")
-    >>> G.add_node("d")
-    >>> G.add_node("e")
-    >>> G.add_edge("a","b")
-    >>> G.add_edge("b","c")
-    >>> G.add_edge("c","d")
-    >>> G.add_edge("d","e")
-    >>> attrs = {("a", "b"): {"Matched": False}, ("b", "c"): {"Matched": True}, ("c", "d"): {"Matched": False}, ("d","e"): {"Matched": True}}
-    >>> nx.set_edge_attributes(G, attrs)
-    >>> two_priority_augmenthing_path(G, ["a","b","c","d","e"])
-    [(a,b),(c,d)]
+        Tests:
+        >>> G = nx.Graph()
+        >>> find_maximum_priority_matching(G)
+
+        >>> G = nx.DiGraph()
+        >>> find_maximum_priority_matching(G)
+
+        >>> G = nx.MultiGraph()
+        >>> find_maximum_priority_matching(G)
+
+        >>> G = nx.MultiDiGraph()
+        >>> find_maximum_priority_matching(G)
+
+        >>> G = nx.Graph()
+        >>> G.add_node("a")
+        >>> G.add_node("b")
+        >>> G.add_node("c")
+        >>> G.add_node("d")
+        >>> G.add_node("e")
+        >>> G.add_node("f")
+        >>> G.add_node("g")
+        >>> G.add_node("h")
+        >>> G.add_node("i")
+        >>> nx.set_node_attributes(G, {"a": 1, "b": 8, "c": 6, "d": 5, "e": 2, "f": 4, "g": 3, "h": 1, "i":7}, name="priority")
+        >>> G.add_edge("a","b")
+        >>> G.add_edge("b","c")
+        >>> G.add_edge("c","d")
+        >>> G.add_edge("d","e")
+        >>> G.add_edge("e","f")
+        >>> G.add_edge("f","g")
+        >>> G.add_edge("g","h")
+        >>> G.add_edge("g","i")
+        >>> G.add_edge("g","c")
+        >>> find_maximum_priority_matching(G)
+        [(a,b),(c,d),(e,f)]
+        '''
+    matching = []
+    return matching
+
+def find_augmenting_path(G: nx.Graph, Priority: int):
     '''
-    NewPath = []
-    return NewPath
+        "Data structures and network algorithms" by Tarjan, Robert E.
 
-def find_augmenting_path(G: nx.Graph, Root: list):
-    '''
-    "Data structures and network algorithms" by Tarjan, Robert E.
+        Programmers: Roi Meshulam and Liroy Melamed
 
-    Programmers: Roi Meshulam and Liroy Melamed
+        Our find_augmenting_path Function gets graph and priority and finding augmenting path in the graph
 
-    Our FindingAugmentingPath Function gets graph and its roots and finding augmenting path in bipartite graph
-    The roots is nodes from S group
+        :param G: nx.Graph
+        :param Priority: integer
+        :return: The augmenting path as a list
 
-    :param G: nx.Graph
-    :param Root: list of roots
-    :return: The augmenting path
+        Tests:
 
-    Tests:
-    >>> G = nx.Graph()
-    >>> G.add_node("a")
-    >>> G.add_node("b")
-    >>> G.add_node("c")
-    >>> G.add_node("d")
-    >>> G.add_node("e")
-    >>> G.add_node("f")
-    >>> G.add_node("g")
-    >>> G.add_node("h")
-    >>> G.add_node("i")
-    >>> G.add_node("j")
-    >>> G.add_node("k")
-    >>> G.add_node("m")
-    >>> G.add_node("n")
-    >>> G.add_node("p")
-    >>> G.add_edge("a","b")
-    >>> G.add_edge("a","c")
-    >>> G.add_edge("b","e")
-    >>> G.add_edge("b","f")
-    >>> G.add_edge("b","d")
-    >>> G.add_edge("c","f")
-    >>> G.add_edge("f","i")
-    >>> G.add_edge("i","h")
-    >>> G.add_edge("i","k")
-    >>> G.add_edge("h","g")
-    >>> G.add_edge("h","j")
-    >>> G.add_edge("j","k")
-    >>> G.add_edge("j","m")
-    >>> G.add_edge("k","n")
-    >>> G.add_edge("m","n")
-    >>> G.add_edge("m","p")
-    >>> attrs = {("b", "e"): {"Matched": True}, ("c", "f"): {"Matched": True}, ("h", "j"): {"Matched": True}, ("k","n"): {"Matched": True}, ("m","p"): {"Matched": True}}
-    >>> nx.set_edge_attributes(G, attrs)
-    >>> find_augmenting_path(G, ["a","b"])
-    g -> h -> j -> k -> n
+        >>> G = nx.Graph()
+        >>> G.add_node("a")
+        >>> G.add_node("b")
+        >>> G.add_node("c")
+        >>> G.add_node("d")
+        >>> G.add_node("e")
+        >>> G.add_node("f")
+        >>> G.add_node("g")
+        >>> G.add_node("h")
+        >>> G.add_node("i")
+        >>> nx.set_node_attributes(G, {"a": 1, "b": 8, "c": 6, "d": 5, "e": 2, "f": 4, "g": 3, "h": 1, "i":7}, name="priority")
+        >>> G.add_edge("a","b")
+        >>> G.add_edge("b","c")
+        >>> G.add_edge("c","d")
+        >>> G.add_edge("d","e")
+        >>> G.add_edge("e","f")
+        >>> G.add_edge("f","g")
+        >>> G.add_edge("g","h")
+        >>> G.add_edge("g","i")
+        >>> G.add_edge("g","c")
+        >>> attrs = {("b", "c"): {"Matched": True}, ("d", "e"): {"Matched": True}, ("f", "g"): {"Matched": True}}
+        >>> find_augmenting_paths(G,2)
+        [a,b,c]
     '''
 
-    augmenthingPath = ""
+    augmenthingPath = []
     return augmenthingPath
 
-def blossom_augmenting_path(G: nx.Graph(), Roots: list):
+def increase_priority_martching(G: nx.Graph, Priority: int):
     '''
-    "algorithm for finding maximum matchings in general graphs" by Micali, Silvio. and V. V. Vazirani.
+        "Data structures and network algorithms" by Tarjan, Robert E.
 
-    Programmers: Roi Meshulam and Liroy Melamed
+        Programmers: Roi Meshulam and Liroy Melamed
 
-    Our blossom_augmenting_path function gets a general graph with blossom and it roots and find the augmenting path
+        Our increase_priority_martching gets graph and priority and return the update graph with matching that
+        maximize the number of priority 1 vertices that are matched
 
-    :param G: general graph with blossom
-    :param Roots: a list of roots
-    :return: the augmenthing path
+        :param G: nx.Graph
+        :param Priority: integer
+        :return: Update graph
 
-    Tests:
-    >>> G = nx.Graph()
-    >>> G.add_node("a")
-    >>> G.add_node("b")
-    >>> G.add_node("c")
-    >>> G.add_node("d")
-    >>> G.add_node("e")
-    >>> G.add_node("f")
-    >>> G.add_node("g")
-    >>> G.add_node("h")
-    >>> G.add_node("i")
-    >>> G.add_node("j")
-    >>> G.add_node("k")
-    >>> G.add_node("m")
-    >>> G.add_edge("a","b")
-    >>> G.add_edge("b","c")
-    >>> G.add_edge("c","f")
-    >>> G.add_edge("c","d")
-    >>> G.add_edge("d","e")
-    >>> G.add_edge("d","g")
-    >>> G.add_edge("e","g")
-    >>> G.add_edge("f","g")
-    >>> G.add_edge("f","h")
-    >>> G.add_edge("g","k")
-    >>> G.add_edge("h","i")
-    >>> G.add_edge("i","j")
-    >>> G.add_edge("j","k")
-    >>> G.add_edge("j","m")
-    >>> G.add_edge("k","m")
-    >>> blossom_augmenting_path(G, ["a","h"])
-    a -> b -> c -> f -> g -> e -> d
+        Tests:
+        >>> ans = nx.Graph()
+        >>> G.add_node("a")
+        >>> G.add_node("b")
+        >>> G.add_node("c")
+        >>> G.add_node("d")
+        >>> G.add_node("e")
+        >>> G.add_node("f")
+        >>> G.add_node("g")
+        >>> G.add_node("h")
+        >>> G.add_node("i")
+        >>> nx.set_node_attributes(G, {"a": 1, "b": 8, "c": 6, "d": 5, "e": 2, "f": 4, "g": 3, "h": 1, "i":7}, name="priority")
+        >>> G.add_edge("a","b")
+        >>> G.add_edge("b","c")
+        >>> G.add_edge("c","d")
+        >>> G.add_edge("d","e")
+        >>> G.add_edge("e","f")
+        >>> G.add_edge("f","g")
+        >>> G.add_edge("g","h")
+        >>> G.add_edge("g","i")
+        >>> G.add_edge("g","c")
+        >>> attrs = {("a", "b"): {"Matched": True}, ("d", "e"): {"Matched": True}, ("g", "h"): {"Matched": True}}
+
+
+        >>> G = nx.Graph()
+        >>> G.add_node("a")
+        >>> G.add_node("b")
+        >>> G.add_node("c")
+        >>> G.add_node("d")
+        >>> G.add_node("e")
+        >>> G.add_node("f")
+        >>> G.add_node("g")
+        >>> G.add_node("h")
+        >>> G.add_node("i")
+        >>> nx.set_node_attributes(G, {"a": 1, "b": 8, "c": 6, "d": 5, "e": 2, "f": 4, "g": 3, "h": 1, "i":7}, name="priority")
+        >>> G.add_edge("a","b")
+        >>> G.add_edge("b","c")
+        >>> G.add_edge("c","d")
+        >>> G.add_edge("d","e")
+        >>> G.add_edge("e","f")
+        >>> G.add_edge("f","g")
+        >>> G.add_edge("g","h")
+        >>> G.add_edge("g","i")
+        >>> G.add_edge("g","c")
+        >>> attrs = {("b", "c"): {"Matched": True}, ("d", "e"): {"Matched": True}, ("f", "g"): {"Matched": True}}
+        >>> increase_priority_martching(G,2)
+        ans
     '''
-    AugmentingPath = ""
-    return AugmentingPath
+    ans = nx.Graph()
+    return ans
+
+
+
 
 if __name__ == '__main__':
     doctest.testmod()
