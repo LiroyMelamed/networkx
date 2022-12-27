@@ -106,10 +106,32 @@ def find_maximum_priority_matching(G: nx.Graph()):
         >>> find_maximum_priority_matching(G)
         [(a,b),(c,d),(e,f)]
         '''
+
+    temp_graph = G.copy()
+    priority_size = G.number_of_nodes()
+
+    # for each priority we maximize the priority score and the matching
+    for priority in range(1,priority_size+1):
+        # loop_condition indicate that there is no more augmenting paths for this priority
+        loop_condition = True
+        print(priority)
+        while(loop_condition):
+            # find an augmenting path and update the graph
+            result = find_augmenting_paths(temp_graph,priority)
+            loop_condition= result[1]
+            print(loop_condition)
+            temp_graph = result[0]
+
     matching = []
+
+    # do it a private function
+    matching_info = nx.get_edge_attributes(temp_graph, 'isMatched')
+    for edge in matching_info:
+        if matching_info[edge] == True:
+            matching.append(edge)
     return matching
 
-def find_augmenting_path(G: nx.Graph, Priority: int):
+def find_augmenting_paths(G: nx.Graph, Priority: int):
     '''
         "Data structures and network algorithms" by Tarjan, Robert E.
 
@@ -148,8 +170,455 @@ def find_augmenting_path(G: nx.Graph, Priority: int):
         [a,b,c]
     '''
 
-    augmenthingPath = []
-    return augmenthingPath
+    Graph = G.copy()
+    # All the graphs after we are using shrink_bolssom function
+    update_graphs = [Graph]
+    # index that indicate on which graph we working now
+    curr_graph= 0
+    # dictionary of all our blossoms
+    blossoms={}
+
+    # preparation for the algorithm
+    preparation = prepare_for_algo(update_graphs[0],Priority)
+    roots = preparation[0]
+    # if there are no more roots so we can proceed to the next priority
+    if len(roots) == 0:
+        print("No relevant roots")
+        return (update_graphs[0],False)
+
+    eligible_edges = preparation[1]
+    while eligible_edges:
+        # select an eligible edge and remove it from the list
+        edge = eligible_edges.pop(0)
+        # all info about the original graph in order to know which condition to make
+        root_list = nx .get_node_attributes(update_graphs[0],"root")
+        reachable_list = nx.get_node_attributes(update_graphs[0],"isReachable")
+        positive_list = nx.get_node_attributes(update_graphs[0], "isPositive")
+        matching_list = nx.get_node_attributes(update_graphs[0], "isMatched")
+        priority_list = nx.get_node_attributes(update_graphs[0], "priority")
+        matching_info = nx.get_edge_attributes(update_graphs[0], "isMatched")
+        external_info = nx.get_node_attributes(update_graphs[0], "isExternal")
+        blossoms_info = nx.get_node_attributes(update_graphs[0], "blossomsID")
+
+        # Both nodes u,v are externals
+        if external_info[edge[0]] is True and external_info[edge[1]] is True:
+            # B(u) is positive
+            if positive_list[edge[0]] is True:
+                u = str(edge[0])
+                v = str(edge[1])
+                #check if B(V) is positive
+                if positive_list[v] is True:
+                    isPositive = True
+                else:
+                    isPositive = False
+
+                # check if u,v in the same tree
+                if root_list[u] == root_list[v]:
+                    sameTree = True
+                else:
+                    sameTree = False
+
+
+            elif positive_list[edge[1]] is True:
+                u = str(edge[1])
+                v = str(edge[0])
+                # if B(V) was positive, the algo was entered to the previous condition
+                isPositive = False
+
+                # check if u,v in the same tree
+                if root_list[u] == root_list[v]:
+                    sameTree = True
+                else:
+                    sameTree = False
+
+            else:
+                continue
+
+        # both of nodes are internals
+        elif external_info[edge[0]] is False and external_info[edge[1]] is False:
+            blossom_id0 = blossoms_info[edge[0]]
+            blossom_id1 = blossoms_info[edge[1]]
+            # check if the blossom of edge[0] is positive
+            if blossoms[blossom_id0]['isPositive'] is True:
+                u = str(edge[0])
+                v = str(edge[1])
+                # check if B(v) is positive
+                if blossoms[blossom_id1]['isPositive'] is True:
+                    isPositive = True
+                else:
+                    isPositive = False
+
+                #check if B(u) and B(V) in the same tree
+                if blossoms[blossom_id0]['root'] == blossoms[blossom_id1]['root']:
+                    sameTree = True
+                else:
+                    sameTree = False
+
+
+            # check if the blossom of edge[1] is positive
+            elif blossoms[blossom_id1]['isPositive'] is True:
+                u = str(edge[1])
+                v = str(edge[0])
+                # if B(V) was positive, the algo was entered to the previous condition
+                isPositive =False
+                # check if B(u) and B(V) in the same tree
+                if blossoms[blossom_id0]['root'] == blossoms[blossom_id1]['root']:
+                    sameTree = True
+                else:
+                    sameTree = False
+
+
+            else:
+                continue
+
+        # one of the nodes is internal
+        else:
+            # check if edge[0] is internal
+            if external_info[edge[0]] is False:
+                blossom_id = blossoms_info[edge[0]]
+                if blossoms[blossom_id]['isPositive'] is True:
+                    u = str(edge[0])
+                    v = str(edge[1])
+                    # check if B(v) is positive
+                    if positive_list[v] is True:
+                        isPositive = True
+                    else:
+                        isPositive = False
+
+                    # check if B(u) and B(v) are in the same tree
+                    if root_list[v] == blossoms[blossom_id]['root']:
+                        sameTree = True
+                    else:
+                        sameTree = False
+
+                elif positive_list[edge[1]] is True:
+                    u = str(edge[1])
+                    v = str(edge[0])
+                    # if B(V) was positive, the algo was entered to the previous condition
+                    isPositive = False
+                    # check if B(u) and B(v) are in the same tree
+                    if root_list[u] == blossoms[blossom_id]['root']:
+                        sameTree = True
+                    else:
+                        sameTree = False
+                else:
+                    continue
+            # edge[1] is internal
+            else:
+                blossom_id = blossoms_info[edge[1]]
+                if positive_list[edge[0]] is True:
+                    u = str(edge[0])
+                    v = str(edge[1])
+                    # check if B(v) is positive
+                    if blossoms[blossom_id]['isPositive'] is True:
+                        isPositive = True
+                    else:
+                        isPositive = False
+                    #check if B(u) and B(v) are in the same tree
+                    if root_list[u] == blossoms[blossom_id]['root']:
+                        sameTree = True
+                    else:
+                        sameTree = False
+
+
+                elif blossoms[blossom_id]['isPositive'] is True:
+                    u = str(edge[1])
+                    v = str(edge[0])
+                    # if B(V) was positive, the algo was entered to the previous condition
+                    isPositive = False
+                    # check if B(u) and B(v) are in the same tree
+                    if root_list[v] == blossoms[blossom_id]['root']:
+                        sameTree = True
+                    else:
+                        sameTree = False
+
+                else:
+                    continue
+
+        print('u : ' + u)
+        print('v : ' + v)
+        print('B(v) isPositive : ' + str(isPositive))
+        print('B(v) and B(u) are in the same tree : ' + str(sameTree))
+
+
+        # if v is unreached and matched
+        if reachable_list[v] is False and matching_list[v] is True:
+            print("first condition")
+            # making v a child of u
+            nx.set_node_attributes(update_graphs[0], {v: {"root": root_list[u], "isPositive": not(positive_list[u]), "isReachable": True, "parent": u}})
+            # find the matched edge between v and w (another vertex in the Graph that incident to v)
+            for w in update_graphs[0].neighbors(v):
+                if w == u:
+                    continue
+
+                if (w,v) in matching_info:
+                    # if p(w)>priority and (w,v) is the matching edge it is augmenting path
+                    if matching_info[(w,v)] is True and priority_list[w] > Priority:
+                        print("augmenting path0")
+                        # making w a child of v
+                        nx.set_node_attributes(update_graphs[0], {
+                            w: {"root": root_list[v], "isPositive": not (positive_list[v]), "isReachable": True,
+                                "parent": v}})
+                        # find the augmenting path
+                        path = find_path(update_graphs,blossoms,w)
+                        # update the augemnting path in update_graph[0]
+                        reverse_path(update_graphs[0],path)
+                        return (update_graphs[0],True)
+
+                    # if (w,v) is the matching edge and the prioirty of w his even or less then Prioirty
+                    if matching_info[(w,v)] is True and priority_list[w] <= Priority:
+                        # make w son of v in the tree
+                        nx.set_node_attributes(update_graphs[0], {w: {"root": root_list[v], "isPositive": not (positive_list[v]), "isReachable": True,"parent": v}})
+                        # add all his incident edges in eligible_edges
+                        for neighbor in update_graphs[0].neighbors(w):
+                            if neighbor != v:
+                                eligible_edges.append((w,neighbor))
+                                print("check first condition")
+                                print(eligible_edges)
+
+                if (v,w) in matching_info:
+                    # if p(w)>priority and (v,w) is the matching edge it is augmenting path
+                    if matching_info[(v,w)] is True and priority_list[w] > Priority:
+                        print("augmenting path1")
+                        # making w a child of v
+                        nx.set_node_attributes(update_graphs[0], {
+                            w: {"root": root_list[v], "isPositive": not (positive_list[v]), "isReachable": True,
+                                "parent": v}})
+                        # find the augmenting path
+                        path = find_path(update_graphs,blossoms, w)
+                        # update the augemnting path in update_graph[0]
+                        reverse_path(update_graphs[0],path)
+                        return (update_graphs[0], True)
+
+                    # if (v,w) is the matching edge and the prioirty of w his even or less then Prioirty
+                    if matching_info[(v,w)] is True and priority_list[w] <= Priority:
+                        # make w son of v in the tree
+                        nx.set_node_attributes(update_graphs[0], {
+                            w: {"root": root_list[v], "isPositive": not (positive_list[v]), "isReachable": True,
+                                "parent": v}})
+                        # add all his incident edges in eligible_edges
+                        for neighbor in update_graphs[0].neighbors(w):
+                            if neighbor != v:
+                                eligible_edges.append((w, neighbor))
+                                print("check first condition")
+                                print(eligible_edges)
+
+        # if v is unreached and unmatched
+        elif reachable_list[v] is False and matching_list[v] is False:
+            print("second condition")
+            # if u is external
+            # if external_info[u] is True:
+            path = find_path(update_graphs,blossoms,u,v,True)
+            reverse_path(update_graphs[0], path)
+            return (update_graphs[0], True)
+
+        # if v is even and in a different tree
+        elif isPositive is True and not sameTree:
+            print("third condition")
+            path = find_path(update_graphs,blossoms,u,v,False)
+            reverse_path(update_graphs[0],path)
+            return (update_graphs[0],True)
+
+
+
+        elif isPositive is True and sameTree:
+            print("fourth condition")
+            priority_list = nx.get_node_attributes(update_graphs[0], "priority")
+            positive_list = nx.get_node_attributes(update_graphs[0], "isPositive")
+
+
+            bolssom = find_bolssom(Graph,u,v)
+            for node in bolssom:
+                # check if there is odd node in the cycle and his priority is higher then Priority, if there is one , so we have an augmenting path
+                if positive_list[node] is False and priority_list[node] > Priority:
+                    print("find augmenting path")
+
+
+            #there is no augmenting path add all incident edges to the odd nodes in the bolssom
+            for node in bolssom:
+                if positive_list[node] is False:
+                    for neighbor in Graph.neighbors(node):
+                        if neighbor != v and neighbor not in bolssom:
+                            eligible_edges.append((node, neighbor))
+                            print(eligible_edges)
+
+            #shrink the bolssom and update the graph
+            shrink_graph(Graph,bolssom)
+
+        else:
+            continue
+
+
+
+
+    return (Graph,False)
+
+
+
+def prepare_for_algo(G:nx.Graph,Priority: int):
+    nodes_priorities = nx.get_node_attributes(G, 'priority')
+    nodes_matching = nx.get_node_attributes(G, 'isMatched')
+    # print(nodes_priorities)
+    # print(nodes_matching)
+
+    roots=[]
+    eligible_edges=[]
+    for node in G.nodes:
+        check_node = str(node)
+        # check if the node in the current priority class and if it doesn't 'touch' the matching yet
+        if nodes_priorities[check_node] == Priority and nodes_matching[check_node] is False:
+            roots.append(node)
+            nx.set_node_attributes(G, {check_node:{"root":check_node,"isPositive":True,"isReachable":True,"parent":None}})
+        #if not we iniliaze all the relevant attributes
+        else:
+            nx.set_node_attributes(G, {check_node: {"root": None, "isPositive": None, "isReachable": False,"parent":None}})
+
+    # print(roots)
+    # get all incident edges to the root into the eligible_edges list
+    for root in roots:
+        for neighbor in G.neighbors(root):
+            edge = (str(root),str(neighbor))
+            eligible_edges.append(edge)
+
+    return (roots,eligible_edges)
+
+
+def find_path (graphs , blossoms , u , v , flag):
+
+    # second condition
+    if flag is True:
+        path = find_path_to_root(graphs[0],blossoms,u,v)
+        path.append(v)
+        return path
+    # flag is False -> third condition
+    else:
+        first_path = find_path_to_root(graphs[0],blossoms, u, v)
+        second_path = find_path_to_root(graphs[0], blossoms, v, u)
+        path = merge_paths(first_path,second_path)
+        return path
+
+
+def find_path(graphs , blossoms ,  id):
+    parents_list = nx.get_node_attributes(graphs[0], "parent")
+    root_list = nx.get_node_attributes(graphs[0], "root")
+    path =[]
+    temp= id
+
+    while root_list[temp] != temp:
+        path.insert(0, temp)
+        temp = parents_list[temp]
+
+    path.insert(0,root_list[temp])
+    print(path)
+    return path
+
+def merge_paths(lst1:list , lst2:list):
+    list=[]
+    for i in lst1:
+        list.append(i)
+    for j in reversed(lst2):
+        list.append(j)
+    return list
+
+def find_bolssom(G:nx.Graph ,blossoms , u , v):
+    positive_list = nx.get_node_attributes(update_graphs[0], "isPositive")
+
+    path_to_root_from_u = find_path(G,blossoms, u , v)
+    path_to_root_from_v = find_path(G,blossoms, v , u)
+    common = []
+    blossom_list = []
+    for item in path_to_root_from_v:
+        if item in path_to_root_from_u:
+            common.append(item)
+        else:
+            blossom_list.append(item)
+
+    ancestor = common[-1]
+    blossom_list.append(ancestor)
+    for item in path_to_root_from_u:
+        if item not in path_to_root_from_v:
+            blossom_list.append(item)
+
+    bolssom_index = len(bolssom_list)
+    key = 'B'+str(bolssom_index)
+    blossoms[key] = {'nodes': blossom_list , 'root':common[0] , 'isPositive':positive_list[ancestor] , 'Base':ancestor }
+
+
+    return bolssoms[key]
+
+
+def find_path_in_blossom(blossom,flag):
+    print("find_path in blossom")
+
+def find_path_to_root(G:nx.Graph,blossoms,u,v):
+    path = []
+    # info
+    external_info = nx.get_node_attributes(G, "isExternal")
+    blossoms_info = nx.get_node_attributes(G, "blossomsID")
+    root_list = nx.get_node_attributes(G, "root")
+    parents_list = nx.get_node_attributes(G, "parent")
+    matching_info = nx.get_edge_attributes(G, "isMatched")
+
+    temp = u
+    while temp != root_list[u]:
+        # temp is external
+        if external_info[temp] is True:
+            path.insert(0, temp)
+            temp = parents_list[temp]
+        # temp is internal
+        else:
+            # find the blossom
+            blossom_id = blossoms_info[temp]
+            blossom = blossoms[blossom_id]
+            if (u, v) in matching_info:
+                # if (u,v) is a matching edge
+                if matching_info[(u, v)] is True:
+                    result = find_path_in_blossom(blossom, True)
+                    sub_path = result[0]
+                    parent = result[1]
+
+
+                else:
+                    result = find_path_in_blossom(blossom, False)
+                    sub_path = result[0]
+                    parent = result[1]
+
+                temp = parent
+                for node in sub_path:
+                    path.insert(0, node)
+
+            if (v, u) in matching_info:
+                # if (v,u) is a matching edge
+                if matching_info[(v, u)] is True:
+                    result = find_path_in_blossom(blossom, True)
+                    sub_path = result[0]
+                    parent = result[1]
+
+                else:
+                    result = find_path_in_blossom(blossom, False)
+                    sub_path = result[0]
+                    parent = result[1]
+
+                temp = parent
+                for node in sub_path:
+                    path.insert(0, node)
+    path.insert(0, temp)
+    return path
+
+
+
+def reverse_path(G:nx.Graph,path):
+    matching_nodes = nx.get_node_attributes(G, "isMatched")
+    matching_edges = nx.get_edge_attributes(G, "isMatched")
+    for i in range(0,len(path)-1):
+        if (path[i],path[i+1]) in matching_edges:
+            nx.set_edge_attributes(G, {(path[i],path[i+1]): {"isMatched": not matching_edges[(path[i],path[i+1])] }})
+        else:
+            nx.set_edge_attributes(G, {(path[i+1], path[i]): {"isMatched": not matching_edges[(path[i+1], path[i])]}})
+
+    nx.set_node_attributes(G, {path[0]: {"isMatched": not matching_nodes[path[0]]}})
+    nx.set_node_attributes(G, {path[-1]: {"isMatched": not matching_nodes[path[-1]]}})
+
 
 def increase_priority_martching(G: nx.Graph, Priority: int):
     '''
@@ -215,6 +684,11 @@ def increase_priority_martching(G: nx.Graph, Priority: int):
     ans = nx.Graph()
     return ans
 
+
+
+
+
+
 def find_maximum_priority_matching_bipartite(G: nx.Graph):
     '''
         "Faster Maximium Priority Matchings in Bipartite Graphs" by Tarjan, Robert E.
@@ -246,11 +720,6 @@ def find_maximum_priority_matching_bipartite(G: nx.Graph):
     '''
     matching = []
     return matching
-
-
-
-
-
 
 
 def increase_priority_martching_bipartite(G: nx.Graph, Priority: int):
@@ -309,4 +778,67 @@ def increase_priority_martching_bipartite(G: nx.Graph, Priority: int):
 
 
 if __name__ == '__main__':
-    doctest.testmod()
+    # doctest.testmod()
+
+    # blossoms={'B1':{'nodes':[1,2,3,4,5],"isPositive":True}}
+    # print(blossoms)
+    # print(blossoms['B1']['nodes'])
+    # index = 1
+    # string = 'B'+str(index)
+    # print(string)
+
+    dict={}
+    dict['apple'] = 'bannaana'
+    print(dict)
+
+
+
+    # G = nx.Graph()
+    # nodes=['1','2','3','4','5','6','7','8','9']
+    # edges = [('1', '2'), ('2', '3'), ('3', '4'), ('4', '5'), ('5', '6'), ('6', '7'), ('7', '8'), ('7', '9'),('7','3')]
+    # nodes_attrs = {'1': {"parent": None, "priority":1 ,"isMatched": False, "isPositive":False, "isReachable": False,"root":None,"isBolssom":False,"isExternal":True,"blossomsID":-1},
+    #          '2': {"parent": None, "priority":8 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},
+    #          '3': {"parent": None, "priority":6 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},
+    #          '4': {"parent": None, "priority":5 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},
+    #          '5': {"parent": None, "priority":2 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},
+    #          '6': {"parent": None, "priority":4 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},
+    #          '7': {"parent": None, "priority":3 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},
+    #          '8': {"parent": None, "priority":1 ,"isMatched": False, "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},
+    #          '9': {"parent": None, "priority":7 ,"isMatched": False, "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1}}
+    #
+    # edges_attrs ={('1', '2'): {"isMatched": False},('2', '3'): {"isMatched": True},('3', '4'): {"isMatched": False},
+    #               ('4', '5'): {"isMatched": True}, ('5', '6'): {"isMatched": False}
+    #               ,('6', '7'): {"isMatched": True},('7', '3'): {"isMatched": False},
+    #               ('7', '8'): {"isMatched": False},('7', '9'): {"isMatched": False}}
+    #
+    # G.add_nodes_from(nodes)
+    # G.add_edges_from(edges)
+    # nx.set_node_attributes(G, nodes_attrs)
+    # nx.set_edge_attributes(G,edges_attrs)
+    # matching = find_maximum_priority_matching(G)
+    # print(str(matching))
+    # path1 = [1,2,3,4,5]
+    # path2 = [9,8,7,6]
+    # path = merge_paths(path1,path2)
+    # print(path)
+
+
+# test for find_ancestor()
+#     path1 = [1,2,3,4,5]
+#     path2 = [1,2,3,6,7]
+#     common=[]
+#     bolssom=[]
+#     for item in path2:
+#         if item in path1:
+#             common.append(item)
+#         else:
+#             bolssom.append(item)
+#
+#     ancestor = common[-1]
+#     bolssom.append(ancestor)
+#     for item in path1:
+#         if item not in path2:
+#             bolssom.append(item)
+#     print(common)
+#     print(bolssom)
+
