@@ -114,12 +114,15 @@ def find_maximum_priority_matching(G: nx.Graph()):
     for priority in range(1,priority_size+1):
         # loop_condition indicate that there is no more augmenting paths for this priority
         loop_condition = True
-        print(priority)
+        print("The algo in prioirty " + str(priority))
         while(loop_condition):
             # find an augmenting path and update the graph
             result = find_augmenting_paths(temp_graph,priority)
             loop_condition= result[1]
-            print(loop_condition)
+            if loop_condition is True:
+                print("The matching was improved")
+            else:
+                print("There are no more augmenting paths")
             temp_graph = result[0]
 
     matching = []
@@ -186,19 +189,67 @@ def find_augmenting_paths(G: nx.Graph, Priority: int):
         print("No relevant roots")
         return (update_graphs[0],False)
 
+    # all info about the original graph in order to know which condition to make
+    root_list = nx.get_node_attributes(update_graphs[0], "root")
+    reachable_list = nx.get_node_attributes(update_graphs[0], "isReachable")
+    positive_list = nx.get_node_attributes(update_graphs[0], "isPositive")
+    matching_list = nx.get_node_attributes(update_graphs[0], "isMatched")
+    priority_list = nx.get_node_attributes(update_graphs[0], "priority")
+    matching_info = nx.get_edge_attributes(update_graphs[0], "isMatched")
+    external_info = nx.get_node_attributes(update_graphs[0], "isExternal")
+    blossoms_info = nx.get_node_attributes(update_graphs[0], "blossomsID")
+    print('roots')
+    print(root_list)
+    print('reachable')
+    print(reachable_list)
+    print('positives')
+    print(positive_list)
+    print('nodes matching')
+    print(matching_list)
+    print('prioirites')
+    print(priority_list)
+    print('edges matching')
+    print(matching_info)
+    print('externals')
+    print(external_info)
+    print('blossoms id')
+    print(blossoms_info)
+    print()
+
+
+
     eligible_edges = preparation[1]
     while eligible_edges:
+        print("eligible edges before pop")
+        print(eligible_edges)
         # select an eligible edge and remove it from the list
         edge = eligible_edges.pop(0)
         # all info about the original graph in order to know which condition to make
-        root_list = nx .get_node_attributes(update_graphs[0],"root")
-        reachable_list = nx.get_node_attributes(update_graphs[0],"isReachable")
+        root_list = nx.get_node_attributes(update_graphs[0], "root")
+        reachable_list = nx.get_node_attributes(update_graphs[0], "isReachable")
         positive_list = nx.get_node_attributes(update_graphs[0], "isPositive")
         matching_list = nx.get_node_attributes(update_graphs[0], "isMatched")
         priority_list = nx.get_node_attributes(update_graphs[0], "priority")
         matching_info = nx.get_edge_attributes(update_graphs[0], "isMatched")
         external_info = nx.get_node_attributes(update_graphs[0], "isExternal")
         blossoms_info = nx.get_node_attributes(update_graphs[0], "blossomsID")
+        print('roots')
+        print(root_list)
+        print('reachable')
+        print(reachable_list)
+        print('positives')
+        print(positive_list)
+        print('nodes matching')
+        print(matching_list)
+        print('prioirites')
+        print(priority_list)
+        print('edges matching')
+        print(matching_info)
+        print('externals')
+        print(external_info)
+        print('blossoms id')
+        print(blossoms_info)
+        print()
 
         # Both nodes u,v are externals
         if external_info[edge[0]] is True and external_info[edge[1]] is True:
@@ -341,11 +392,13 @@ def find_augmenting_paths(G: nx.Graph, Priority: int):
         print('B(v) and B(u) are in the same tree : ' + str(sameTree))
 
 
-        # if v is unreached and matched
+        # if v is unreached and matched (condition 1)
         if reachable_list[v] is False and matching_list[v] is True:
             print("first condition")
             # making v a child of u
             nx.set_node_attributes(update_graphs[0], {v: {"root": root_list[u], "isPositive": not(positive_list[u]), "isReachable": True, "parent": u}})
+            # update root_list
+            root_list = nx.get_node_attributes(update_graphs[0], "root")
             # find the matched edge between v and w (another vertex in the Graph that incident to v)
             for w in update_graphs[0].neighbors(v):
                 if w == u:
@@ -360,7 +413,7 @@ def find_augmenting_paths(G: nx.Graph, Priority: int):
                             w: {"root": root_list[v], "isPositive": not (positive_list[v]), "isReachable": True,
                                 "parent": v}})
                         # find the augmenting path
-                        path = find_path(update_graphs,blossoms,w)
+                        path = find_path1(update_graphs,blossoms,w)
                         # update the augemnting path in update_graph[0]
                         reverse_path(update_graphs[0],path)
                         return (update_graphs[0],True)
@@ -372,9 +425,10 @@ def find_augmenting_paths(G: nx.Graph, Priority: int):
                         # add all his incident edges in eligible_edges
                         for neighbor in update_graphs[0].neighbors(w):
                             if neighbor != v:
-                                eligible_edges.append((w,neighbor))
-                                print("check first condition")
-                                print(eligible_edges)
+                                if (w, neighbor) not in eligible_edges and (neighbor, w) not in eligible_edges:
+                                    eligible_edges.append((w, neighbor))
+                                    print("check first condition0")
+
 
                 if (v,w) in matching_info:
                     # if p(w)>priority and (v,w) is the matching edge it is augmenting path
@@ -385,7 +439,7 @@ def find_augmenting_paths(G: nx.Graph, Priority: int):
                             w: {"root": root_list[v], "isPositive": not (positive_list[v]), "isReachable": True,
                                 "parent": v}})
                         # find the augmenting path
-                        path = find_path(update_graphs,blossoms, w)
+                        path = find_path1(update_graphs,blossoms, w)
                         # update the augemnting path in update_graph[0]
                         reverse_path(update_graphs[0],path)
                         return (update_graphs[0], True)
@@ -399,11 +453,12 @@ def find_augmenting_paths(G: nx.Graph, Priority: int):
                         # add all his incident edges in eligible_edges
                         for neighbor in update_graphs[0].neighbors(w):
                             if neighbor != v:
-                                eligible_edges.append((w, neighbor))
-                                print("check first condition")
-                                print(eligible_edges)
+                                if (w, neighbor) not in eligible_edges and (neighbor,w) not in eligible_edges:
+                                    eligible_edges.append((w, neighbor))
+                                    print("check first condition1")
 
-        # if v is unreached and unmatched
+
+        # if v is unreached and unmatched (condition 2)
         elif reachable_list[v] is False and matching_list[v] is False:
             print("second condition")
             # if u is external
@@ -412,47 +467,57 @@ def find_augmenting_paths(G: nx.Graph, Priority: int):
             reverse_path(update_graphs[0], path)
             return (update_graphs[0], True)
 
-        # if v is even and in a different tree
+        # if v is even and in a different tree (condition 3)
         elif isPositive is True and not sameTree:
             print("third condition")
             path = find_path(update_graphs,blossoms,u,v,False)
+            print(path)
             reverse_path(update_graphs[0],path)
             return (update_graphs[0],True)
 
 
-
+        # condition 4
         elif isPositive is True and sameTree:
             print("fourth condition")
             priority_list = nx.get_node_attributes(update_graphs[0], "priority")
             positive_list = nx.get_node_attributes(update_graphs[0], "isPositive")
 
+            result = find_bolssom(update_graphs[0],blossoms,u,v)
+            # the blossom value
+            blossom = result[0]
+            # the blossom key
+            key = result[1]
 
-            bolssom = find_bolssom(Graph,u,v)
-            for node in bolssom:
+            for node in blossom['nodes']:
                 # check if there is odd node in the cycle and his priority is higher then Priority, if there is one , so we have an augmenting path
                 if positive_list[node] is False and priority_list[node] > Priority:
                     print("find augmenting path")
 
 
+
             #there is no augmenting path add all incident edges to the odd nodes in the bolssom
-            for node in bolssom:
+            for node in blossom['nodes']:
                 if positive_list[node] is False:
-                    for neighbor in Graph.neighbors(node):
-                        if neighbor != v and neighbor not in bolssom:
+                    for neighbor in update_graphs[0].neighbors(node):
+                        if neighbor not in blossom['nodes'] and (node, neighbor) not in eligible_edges and (neighbor,node) not in eligible_edges:
                             eligible_edges.append((node, neighbor))
                             print(eligible_edges)
 
             #shrink the bolssom and update the graph
-            shrink_graph(Graph,bolssom)
+            shrink_graph(update_graphs[0],blossom,key)
 
         else:
             continue
 
 
+    return (update_graphs[0],False)
 
-
-    return (Graph,False)
-
+def shrink_graph(G:nx.Graph,blossom,key):
+    print("shrink blossom")
+    print(blossom)
+    for node in blossom['nodes']:
+        nx.set_node_attributes(G, {
+            node: {"isExternal": False, "blossomsID": key}})
 
 
 def prepare_for_algo(G:nx.Graph,Priority: int):
@@ -468,10 +533,10 @@ def prepare_for_algo(G:nx.Graph,Priority: int):
         # check if the node in the current priority class and if it doesn't 'touch' the matching yet
         if nodes_priorities[check_node] == Priority and nodes_matching[check_node] is False:
             roots.append(node)
-            nx.set_node_attributes(G, {check_node:{"root":check_node,"isPositive":True,"isReachable":True,"parent":None}})
+            nx.set_node_attributes(G, {check_node:{"root":check_node,"isPositive":True,"isReachable":True,"parent":None,"isExternal": True, "blossomsID": -1}})
         #if not we iniliaze all the relevant attributes
         else:
-            nx.set_node_attributes(G, {check_node: {"root": None, "isPositive": None, "isReachable": False,"parent":None}})
+            nx.set_node_attributes(G, {check_node: {"root": None, "isPositive": None, "isReachable": False,"parent":None,"isExternal": True, "blossomsID": -1}})
 
     # print(roots)
     # get all incident edges to the root into the eligible_edges list
@@ -484,21 +549,29 @@ def prepare_for_algo(G:nx.Graph,Priority: int):
 
 
 def find_path (graphs , blossoms , u , v , flag):
-
+    print("find path function")
     # second condition
     if flag is True:
+        print("sec cond")
         path = find_path_to_root(graphs[0],blossoms,u,v)
         path.append(v)
+        print(path)
         return path
     # flag is False -> third condition
     else:
+        print("third cond")
         first_path = find_path_to_root(graphs[0],blossoms, u, v)
+        print("first")
+        print(first_path)
         second_path = find_path_to_root(graphs[0], blossoms, v, u)
+        print("sec")
+        print(second_path)
         path = merge_paths(first_path,second_path)
+        print(path)
         return path
 
 
-def find_path(graphs , blossoms ,  id):
+def find_path1(graphs , blossoms ,  id):
     parents_list = nx.get_node_attributes(graphs[0], "parent")
     root_list = nx.get_node_attributes(graphs[0], "root")
     path =[]
@@ -521,10 +594,15 @@ def merge_paths(lst1:list , lst2:list):
     return list
 
 def find_bolssom(G:nx.Graph ,blossoms , u , v):
-    positive_list = nx.get_node_attributes(update_graphs[0], "isPositive")
+    print("find blossom")
+    positive_list = nx.get_node_attributes(G, "isPositive")
 
-    path_to_root_from_u = find_path(G,blossoms, u , v)
-    path_to_root_from_v = find_path(G,blossoms, v , u)
+    path_to_root_from_u = find_path_to_root(G,blossoms, u , v)
+    path_to_root_from_v = find_path_to_root(G,blossoms, v , u)
+
+    print(path_to_root_from_v)
+    print(path_to_root_from_u)
+
     common = []
     blossom_list = []
     for item in path_to_root_from_v:
@@ -534,23 +612,106 @@ def find_bolssom(G:nx.Graph ,blossoms , u , v):
             blossom_list.append(item)
 
     ancestor = common[-1]
-    blossom_list.append(ancestor)
+    blossom_list.insert(0,ancestor)
     for item in path_to_root_from_u:
         if item not in path_to_root_from_v:
-            blossom_list.append(item)
+            blossom_list.insert(0,item)
 
-    bolssom_index = len(bolssom_list)
-    key = 'B'+str(bolssom_index)
+    blossom_index = len(blossoms)
+    key = 'B'+str(blossom_index)
     blossoms[key] = {'nodes': blossom_list , 'root':common[0] , 'isPositive':positive_list[ancestor] , 'Base':ancestor }
+    print(blossoms)
+
+    return (blossoms[key] , key)
 
 
-    return bolssoms[key]
-
-
-def find_path_in_blossom(blossom,flag):
+def find_path_in_blossom(G:nx.Graph,blossom,flag,u):
     print("find_path in blossom")
+    matching_info = nx.get_edge_attributes(G, "isMatched")
+    parents_info = nx.get_node_attributes(G, "parent")
+    path=[]
+
+    paths = paths_to_base(blossom['nodes'],u,blossom['Base'])
+    path1 = paths[0]
+    path2 = paths[1]
+    parent = parents_info[blossom['Base']]
+    # (u,v) is a matching edge
+    if flag is True:
+        w = path1[1]
+        print(w)
+        if (u,w) in matching_info:
+            if matching_info[(u,w)] is False:
+                return (path1,parent)
+            else:
+                return (path2,parent)
+
+        else:
+            if matching_info[(w,u)] is False:
+                return (path1,parent)
+            else:
+                return (path2,parent)
+
+
+    #  (u,v) is not a matching edge
+    else:
+        w = path1[1]
+        print(w)
+        if (u, w) in matching_info:
+            if matching_info[(u, w)] is True:
+                return (path1,parent)
+            else:
+                return (path2,parent)
+
+        else:
+            if matching_info[(w, u)] is True:
+                return (path1,parent)
+            else:
+                return (path2,parent)
+
+
+
+def paths_to_base(list,u,base):
+    path1 = []
+    path2 = []
+    pos = list.index(u)
+    temp = u
+
+    while temp != base:
+        print(temp)
+        # path1.insert(0,temp)
+        path1.append(temp)
+        if pos == (len(list)-1):
+            pos = 0
+        else:
+            pos = pos + 1
+        temp = list[pos]
+
+    # path1.insert(0,base)
+    path1.append(base)
+    temp = u
+    pos = list.index(u)
+    while temp != base:
+        print(temp)
+        path2.append(temp)
+        if pos == 0:
+            pos = (len(list)-1)
+        else:
+            pos = pos - 1
+        temp = list[pos]
+
+    path2.append(base)
+    print("paths to base check")
+    print("path1")
+    print(path1)
+    print("path2")
+    print(path2)
+
+    return (path1,path2)
+
+
 
 def find_path_to_root(G:nx.Graph,blossoms,u,v):
+    print("find_path_to_the_root")
     path = []
     # info
     external_info = nx.get_node_attributes(G, "isExternal")
@@ -569,45 +730,52 @@ def find_path_to_root(G:nx.Graph,blossoms,u,v):
         else:
             # find the blossom
             blossom_id = blossoms_info[temp]
+            print(blossom_id)
             blossom = blossoms[blossom_id]
+            print(blossom)
             if (u, v) in matching_info:
                 # if (u,v) is a matching edge
                 if matching_info[(u, v)] is True:
-                    result = find_path_in_blossom(blossom, True)
+                    result = find_path_in_blossom(G,blossom,True,u)
                     sub_path = result[0]
                     parent = result[1]
 
 
                 else:
-                    result = find_path_in_blossom(blossom, False)
+                    result = find_path_in_blossom(G,blossom, False,u)
                     sub_path = result[0]
                     parent = result[1]
 
                 temp = parent
-                for node in sub_path:
-                    path.insert(0, node)
+                for node in reversed(sub_path):
+                    print(node)
+                    path.append(node)
 
             if (v, u) in matching_info:
                 # if (v,u) is a matching edge
                 if matching_info[(v, u)] is True:
-                    result = find_path_in_blossom(blossom, True)
+                    result = find_path_in_blossom(G,blossom, True,u)
                     sub_path = result[0]
                     parent = result[1]
 
                 else:
-                    result = find_path_in_blossom(blossom, False)
+                    result = find_path_in_blossom(G,blossom, False,u)
                     sub_path = result[0]
                     parent = result[1]
 
                 temp = parent
-                for node in sub_path:
-                    path.insert(0, node)
+                for node in reversed(sub_path):
+                    print(node)
+                    path.append(node)
+
     path.insert(0, temp)
     return path
 
 
 
 def reverse_path(G:nx.Graph,path):
+    print("reverse the path")
+
     matching_nodes = nx.get_node_attributes(G, "isMatched")
     matching_edges = nx.get_edge_attributes(G, "isMatched")
     for i in range(0,len(path)-1):
@@ -620,69 +788,7 @@ def reverse_path(G:nx.Graph,path):
     nx.set_node_attributes(G, {path[-1]: {"isMatched": not matching_nodes[path[-1]]}})
 
 
-def increase_priority_martching(G: nx.Graph, Priority: int):
-    '''
-        "Data structures and network algorithms" by Tarjan, Robert E.
 
-        Programmers: Roi Meshulam and Liroy Melamed
-
-        Our increase_priority_martching gets graph and priority and return the update graph with matching that
-        maximize the number of priority 1 vertices that are matched
-
-        :param G: nx.Graph
-        :param Priority: integer
-        :return: Update graph
-
-        Tests:
-        >>> ans = nx.Graph()
-        >>> ans.add_node("a")
-        >>> ans.add_node("b")
-        >>> ans.add_node("c")
-        >>> ans.add_node("d")
-        >>> ans.add_node("e")
-        >>> ans.add_node("f")
-        >>> ans.add_node("g")
-        >>> ans.add_node("h")
-        >>> ans.add_node("i")
-        >>> nx.set_node_attributes(ans, {"a": 1, "b": 8, "c": 6, "d": 5, "e": 2, "f": 4, "g": 3, "h": 1, "i":7}, name="priority")
-        >>> ans.add_edge("a","b")
-        >>> ans.add_edge("b","c")
-        >>> ans.add_edge("c","d")
-        >>> ans.add_edge("d","e")
-        >>> ans.add_edge("e","f")
-        >>> ans.add_edge("f","g")
-        >>> ans.add_edge("g","h")
-        >>> ans.add_edge("g","i")
-        >>> ans.add_edge("g","c")
-        >>> attrs = {("a", "b"): {"Matched": True}, ("d", "e"): {"Matched": True}, ("g", "h"): {"Matched": True}}
-
-
-        >>> G = nx.Graph()
-        >>> G.add_node("a")
-        >>> G.add_node("b")
-        >>> G.add_node("c")
-        >>> G.add_node("d")
-        >>> G.add_node("e")
-        >>> G.add_node("f")
-        >>> G.add_node("g")
-        >>> G.add_node("h")
-        >>> G.add_node("i")
-        >>> nx.set_node_attributes(G, {"a": 1, "b": 8, "c": 6, "d": 5, "e": 2, "f": 4, "g": 3, "h": 1, "i":7}, name="priority")
-        >>> G.add_edge("a","b")
-        >>> G.add_edge("b","c")
-        >>> G.add_edge("c","d")
-        >>> G.add_edge("d","e")
-        >>> G.add_edge("e","f")
-        >>> G.add_edge("f","g")
-        >>> G.add_edge("g","h")
-        >>> G.add_edge("g","i")
-        >>> G.add_edge("g","c")
-        >>> attrs = {("b", "c"): {"Matched": True}, ("d", "e"): {"Matched": True}, ("f", "g"): {"Matched": True}}
-        >>> increase_priority_martching(G,2)
-        ans
-    '''
-    ans = nx.Graph()
-    return ans
 
 
 
@@ -787,36 +893,81 @@ if __name__ == '__main__':
     # string = 'B'+str(index)
     # print(string)
 
-    dict={}
-    dict['apple'] = 'bannaana'
-    print(dict)
-
-
-
+    # dict={}
+    # dict['apple'] = 'bannaana'
+    # print(dict)
     # G = nx.Graph()
-    # nodes=['1','2','3','4','5','6','7','8','9']
-    # edges = [('1', '2'), ('2', '3'), ('3', '4'), ('4', '5'), ('5', '6'), ('6', '7'), ('7', '8'), ('7', '9'),('7','3')]
-    # nodes_attrs = {'1': {"parent": None, "priority":1 ,"isMatched": False, "isPositive":False, "isReachable": False,"root":None,"isBolssom":False,"isExternal":True,"blossomsID":-1},
-    #          '2': {"parent": None, "priority":8 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},
-    #          '3': {"parent": None, "priority":6 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},
-    #          '4': {"parent": None, "priority":5 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},
-    #          '5': {"parent": None, "priority":2 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},
-    #          '6': {"parent": None, "priority":4 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},
-    #          '7': {"parent": None, "priority":3 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},
-    #          '8': {"parent": None, "priority":1 ,"isMatched": False, "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},
-    #          '9': {"parent": None, "priority":7 ,"isMatched": False, "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1}}
+    # nodes = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
+    # edges = [('1', '2'), ('2', '3'), ('3', '4'),('3','6'), ('4', '5'), ('5', '7'), ('6', '7'), ('7', '11'), ('8', '9'), ('9', '10'),('10','11'),('10','12'),('11','12')]
+    # nodes_attrs = {'1': {"parent": None, "priority": 1, "isMatched": False, "isPositive": False, "isReachable": False,
+    #                      "root": None, "isBolssom": False, "isExternal": True, "blossomsID": -1},
+    #                '2': {"parent": None, "priority": 2, "isMatched": True, "isPositive": False, "isReachable": False,
+    #                      "root": None, "isBolssom": False, "isExternal": True, "blossomsID": -1},
+    #                '3': {"parent": None, "priority": 1, "isMatched": True, "isPositive": False, "isReachable": False,
+    #                      "root": None, "isBolssom": False, "isExternal": True, "blossomsID": -1},
+    #                '4': {"parent": None, "priority": 1, "isMatched": True, "isPositive": False, "isReachable": False,
+    #                      "root": None, "isBolssom": False, "isExternal": True, "blossomsID": -1},
+    #                '5': {"parent": None, "priority": 1, "isMatched": True, "isPositive": False, "isReachable": False,
+    #                      "root": None, "isBolssom": False, "isExternal": True, "blossomsID": -1},
+    #                '6': {"parent": None, "priority": 1, "isMatched": True, "isPositive": False, "isReachable": False,
+    #                      "root": None, "isBolssom": False, "isExternal": True, "blossomsID": -1},
+    #                '7': {"parent": None, "priority": 1, "isMatched": True, "isPositive": False, "isReachable": False,
+    #                      "root": None, "isBolssom": False, "isExternal": True, "blossomsID": -1},
+    #                '8': {"parent": None, "priority": 1, "isMatched": False, "isPositive": False, "isReachable": False,
+    #                      "root": None, "isBolssom": False, "isExternal": True, "blossomsID": -1},
+    #                '9': {"parent": None, "priority": 2, "isMatched": True, "isPositive": False, "isReachable": False,
+    #                      "root": None, "isBolssom": False, "isExternal": True, "blossomsID": -1},
+    #                '10': {"parent": None, "priority": 1, "isMatched": True, "isPositive": False, "isReachable": False,
+    #                      "root": None, "isBolssom": False, "isExternal": True, "blossomsID": -1},
+    #                '11': {"parent": None, "priority": 1, "isMatched": True, "isPositive": False, "isReachable": False,
+    #                       "root": None, "isBolssom": False, "isExternal": True, "blossomsID": -1},
+    #                '12': {"parent": None, "priority": 1, "isMatched": True, "isPositive": False, "isReachable": False,
+    #                       "root": None, "isBolssom": False, "isExternal": True, "blossomsID": -1}
+    #                }
     #
-    # edges_attrs ={('1', '2'): {"isMatched": False},('2', '3'): {"isMatched": True},('3', '4'): {"isMatched": False},
-    #               ('4', '5'): {"isMatched": True}, ('5', '6'): {"isMatched": False}
-    #               ,('6', '7'): {"isMatched": True},('7', '3'): {"isMatched": False},
-    #               ('7', '8'): {"isMatched": False},('7', '9'): {"isMatched": False}}
+    # edges_attrs = {('1', '2'): {"isMatched": False}, ('2', '3'): {"isMatched": True}, ('3', '4'): {"isMatched": False},
+    #                ('3','6'):{"isMatched":False},('4', '5'): {"isMatched": True}, ('5', '7'): {"isMatched": False},
+    #                ('6', '7'): {"isMatched": True}, ('7', '11'): {"isMatched": False},
+    #                ('8', '9'): {"isMatched": False}, ('9', '10'): {"isMatched": True},
+    #                ('10', '11'): {"isMatched": False}, ('10', '12'): {"isMatched": False}, ('11', '12'): {"isMatched": True}}
+    #
+    #
     #
     # G.add_nodes_from(nodes)
     # G.add_edges_from(edges)
     # nx.set_node_attributes(G, nodes_attrs)
-    # nx.set_edge_attributes(G,edges_attrs)
+    # nx.set_edge_attributes(G, edges_attrs)
     # matching = find_maximum_priority_matching(G)
-    # print(str(matching))
+
+
+
+
+    G = nx.Graph()
+    nodes=['1','2','3','4','5','6','7','8','9']
+    edges = [('1', '2'), ('2', '3'), ('3', '4'), ('4', '5'), ('5', '6'), ('6', '7'), ('7', '8'), ('7', '9'),('7','3')]
+    nodes_attrs = {'1': {"parent": None, "priority":1 ,"isMatched": False, "isPositive":False, "isReachable": False,"root":None,"isBolssom":False,"isExternal":True,"blossomsID":-1},
+             '2': {"parent": None, "priority":8 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},
+             '3': {"parent": None, "priority":6 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},
+             '4': {"parent": None, "priority":5 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},
+             '5': {"parent": None, "priority":2 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},
+             '6': {"parent": None, "priority":4 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},
+             '7': {"parent": None, "priority":3 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},
+             '8': {"parent": None, "priority":1 ,"isMatched": False, "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},
+             '9': {"parent": None, "priority":7 ,"isMatched": False, "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1}}
+
+    edges_attrs ={('1', '2'): {"isMatched": False},('2', '3'): {"isMatched": True},('3', '4'): {"isMatched": False},
+                  ('4', '5'): {"isMatched": True}, ('5', '6'): {"isMatched": False}
+                  ,('6', '7'): {"isMatched": True},('7', '3'): {"isMatched": False},
+                  ('7', '8'): {"isMatched": False},('7', '9'): {"isMatched": False}}
+
+    G.add_nodes_from(nodes)
+    G.add_edges_from(edges)
+    nx.set_node_attributes(G, nodes_attrs)
+    nx.set_edge_attributes(G,edges_attrs)
+    matching = find_maximum_priority_matching(G)
+
+
+    print(str(matching))
     # path1 = [1,2,3,4,5]
     # path2 = [9,8,7,6]
     # path = merge_paths(path1,path2)
