@@ -19,33 +19,28 @@ def find_priority_score(G: nx.Graph):
     Tests:
 
     >>> G = nx.Graph()
-    >>> G.add_node("a")
-    >>> G.add_node("b")
-    >>> G.add_node("c")
-    >>> G.add_node("d")
-    >>> G.add_node("e")
-    >>> G.add_node("f")
-    >>> G.add_node("g")
-    >>> G.add_node("h")
-    >>> G.add_node("i")
-    >>> G.add_node("j")
-    >>> nx.set_node_attributes(G, {"a": 2, "b": 2, "c": 5, "d": 1, "e": 3, "f": 4, "g": 4, "h": 6, "i":8, "j": 1}, name="priority")
-    >>> G.add_edge("a","b")
-    >>> G.add_edge("a","c")
-    >>> G.add_edge("a","d")
-    >>> G.add_edge("b","e")
-    >>> G.add_edge("b","f")
-    >>> G.add_edge("b","d")
-    >>> G.add_edge("c","d")
-    >>> G.add_edge("d","h")
-    >>> G.add_edge("d","i")
-    >>> G.add_edge("f","i")
-    >>> G.add_edge("f","g")
-    >>> G.add_edge("f","j")
+    >>> nodes=['1','2','3','4','5','6','7','8','9']
+    >>> edges = [('1', '2'), ('2', '3'), ('3', '4'), ('4', '5'), ('5', '6'), ('6', '7'), ('7', '8'), ('7', '9'),('7','3')]
+    >>> nodes_attrs = {'1': {"parent": None, "priority":1 ,"isMatched": True, "isPositive":False, "isReachable": False,"root":None,"isBolssom":False,"isExternal":True,"blossomsID":-1},'2': {"parent": None, "priority":8 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},'3': {"parent": None, "priority":6 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},'4': {"parent": None, "priority":5 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},'5': {"parent": None, "priority":2 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},'6': {"parent": None, "priority":4 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},'7': {"parent": None, "priority":3 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},'8': {"parent": None, "priority":1 ,"isMatched": True, "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},'9': {"parent": None, "priority":7 ,"isMatched": False, "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1}}
+    >>> edges_attrs ={('1', '2'): {"isMatched": True},('2', '3'): {"isMatched": False},('3', '4'): {"isMatched": True},('4', '5'): {"isMatched": False}, ('5', '6'): {"isMatched": True},('6', '7'): {"isMatched": False},('7', '3'): {"isMatched": False},('7', '8'): {"isMatched": True},('7', '9'): {"isMatched": False}}
+    >>> G.add_nodes_from(nodes)
+    >>> G.add_edges_from(edges)
+    >>> nx.set_node_attributes(G, nodes_attrs)
+    >>> nx.set_edge_attributes(G,edges_attrs)
     >>> find_priority_score(G)
-    2111000100
+    '211111010'
     '''
+    temp = [0]
+    priority_size = G.number_of_nodes()
+    score_list = temp * priority_size
+    matching_info = nx.get_node_attributes(G,'isMatched')
+    priority_info = nx.get_node_attributes(G,'priority')
+    for node in G.nodes:
+        if matching_info[node] is True:
+            score_list[priority_info[node]-1] = score_list[priority_info[node]-1] + 1
     score = ""
+    for x in score_list:
+        score += str(x)
     return score
 
 def find_maximum_priority_matching(G: nx.Graph()):
@@ -138,8 +133,8 @@ def find_augmenting_paths(G: nx.Graph, Priority: int):
         >>> G.add_edges_from(edges)
         >>> nx.set_node_attributes(G, nodes_attrs)
         >>> nx.set_edge_attributes(G,edges_attrs)
-        >>> find_augmenting_paths(G,1)
-        [a,b,c]
+
+
     '''
 
     Graph = G.copy()
@@ -460,16 +455,29 @@ def shrink_graph(G:nx.Graph,blossom,key):
    :return: Tuple of two lists
 
    Tests:
-
-
-   >>> G = nx.Graph()
-
-
+    >>> G = nx.Graph()
+    >>> nodes = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
+    >>> edges = [('1', '2'), ('2', '3'), ('3', '4'),('3','6'), ('4', '5'), ('5', '7'), ('6', '7'), ('7', '11'), ('8', '9'), ('9', '10'),('10','11'),('10','12'),('11','12')]
+    >>> nodes_attrs = {'1': {"parent": None, "priority": 1, "isMatched": False, "isPositive": True, "isReachable": True,"root": '1', "isBolssom": False, "isExternal": True, "blossomsID": -1},'2': {"parent": '1', "priority": 2, "isMatched": True, "isPositive": False, "isReachable": True,"root": '1', "isBolssom": False, "isExternal": True, "blossomsID": -1},'3': {"parent": '2', "priority": 1, "isMatched": True, "isPositive": True, "isReachable": True,"root": '1', "isBolssom": False, "isExternal": True, "blossomsID": -1},'4': {"parent": '3', "priority": 1, "isMatched": True, "isPositive": False, "isReachable": True,"root": '1', "isBolssom": False, "isExternal": True, "blossomsID": -1},'5': {"parent": '4', "priority": 1, "isMatched": True, "isPositive": True, "isReachable": True,"root": '1', "isBolssom": False, "isExternal": True, "blossomsID": -1},'6': {"parent": '3', "priority": 1, "isMatched": True, "isPositive": False, "isReachable": True,"root": '1', "isBolssom": False, "isExternal": True, "blossomsID": -1},'7': {"parent": '6', "priority": 1, "isMatched": True, "isPositive": True, "isReachable": True,"root": '1', "isBolssom": False, "isExternal": True, "blossomsID": -1},'8': {"parent": None, "priority": 1, "isMatched": False, "isPositive": False, "isReachable": False,"root": None, "isBolssom": False, "isExternal": True, "blossomsID": -1},'9': {"parent": None, "priority": 2, "isMatched": True, "isPositive": False, "isReachable": False,"root": None, "isBolssom": False, "isExternal": True, "blossomsID": -1},'10': {"parent": None, "priority": 1, "isMatched": True, "isPositive": False, "isReachable": False,"root": None, "isBolssom": False, "isExternal": True, "blossomsID": -1},'11': {"parent": None, "priority": 1, "isMatched": True, "isPositive": False, "isReachable": False,"root": None, "isBolssom": False, "isExternal": True, "blossomsID": -1},'12': {"parent": None, "priority": 1, "isMatched": True, "isPositive": False, "isReachable": False,"root": None, "isBolssom": False, "isExternal": True, "blossomsID": -1}}
+    >>> edges_attrs = {('1', '2'): {"isMatched": False}, ('2', '3'): {"isMatched": True}, ('3', '4'): {"isMatched": False},('3','6'):{"isMatched":False},('4', '5'): {"isMatched": True}, ('5', '7'): {"isMatched": False},('6', '7'): {"isMatched": True}, ('7', '11'): {"isMatched": False},('8', '9'): {"isMatched": False}, ('9', '10'): {"isMatched": True},('10', '11'): {"isMatched": False}, ('10', '12'): {"isMatched": False}, ('11', '12'): {"isMatched": True}}
+    >>> G.add_nodes_from(nodes)
+    >>> G.add_edges_from(edges)
+    >>> nx.set_node_attributes(G, nodes_attrs)
+    >>> nx.set_edge_attributes(G, edges_attrs)
+    >>> shrink_graph(G,{'nodes':['5','4','3','6','7']},'B0')
+    [(False, 'B0'), (False, 'B0'), (False, 'B0'), (False, 'B0'), (False, 'B0')]
    '''
 
     for node in blossom['nodes']:
         nx.set_node_attributes(G, {
             node: {"isExternal": False, "blossomsID": key}})
+
+    test = []
+    external_info = nx.get_node_attributes(G,"isExternal")
+    blossoms_info = nx.get_node_attributes(G, "blossomsID")
+    for node in blossom['nodes']:
+        test.append((external_info[node],blossoms_info[node]))
+    return test
 
 def prepare_for_algo(G:nx.Graph,Priority: int):
     '''
@@ -910,7 +918,7 @@ def reverse_path(G:nx.Graph,path):
         >>> nx.set_node_attributes(G, nodes_attrs)
         >>> nx.set_edge_attributes(G, edges_attrs)
         >>> reverse_path(G , ['1','2','3'])
-        >>> matching_edges = nx.get_edge_attributes(G, "isMatched")
+
         '''
 
     matching_nodes = nx.get_node_attributes(G, "isMatched")
@@ -923,7 +931,7 @@ def reverse_path(G:nx.Graph,path):
 
     nx.set_node_attributes(G, {path[0]: {"isMatched": not matching_nodes[path[0]]}})
     nx.set_node_attributes(G, {path[-1]: {"isMatched": not matching_nodes[path[-1]]}})
-    matching_edges = nx.get_edge_attributes(G, "isMatched")
+
 
 
 
@@ -941,76 +949,250 @@ def find_maximum_priority_matching_bipartite(G: nx.Graph):
         :return: A list of edges
 
         Tests:
+        >>> G = nx.Graph()
+        >>> nodes = ['1', '2', '3', '4', '5', '6']
+        >>> edges = [('1', '2'), ('1', '4'), ('3', '6'),('5', '6')]
+        >>> nodes_attrs = {'1': {"priority": 1, "Group": 1,"isMatched": True},'2': {"priority": 3, "Group": 2,"isMatched": False},'3': {"priority": 2, "Group": 1,"isMatched": False},'4': {"priority": 4, "Group": 2,"isMatched": True},'5': {"priority": 5, "Group": 1,"isMatched": True},'6': {"priority": 6, "Group": 2,"isMatched": True}    }
+        >>> edges_attrs = {('1', '2'): {"isMatched": False ,"flow":0}, ('1', '4'): {"isMatched": True ,"flow":0}, ('3', '6'): {"isMatched": False ,"flow":0},('5','6'):{"isMatched":True ,"flow":0}}
+        >>> G.add_nodes_from(nodes)
+        >>> G.add_edges_from(edges)
+        >>> nx.set_node_attributes(G, nodes_attrs)
+        >>> nx.set_edge_attributes(G, edges_attrs)
+        >>> find_maximum_priority_matching_bipartite(G)
+        [('1', '2'), ('3', '6')]
 
     '''
+    # The algorithm maximizes the matching for each prioirty
     priority_size = G.number_of_nodes()
     for priority in range(1, priority_size + 1):
         matching_info = nx.get_edge_attributes(G, 'isMatched')
+        # our matching
         m1 = []
         m2 = []
         m3 = []
+        # m1 is the first matching in prioirty i before we run the algorithm
         for edge in matching_info:
             if matching_info[edge] == True:
                 m1.append(edge)
-
+        # loop condition indicates if there are more augmenting paths
         loop_condition = True
         while loop_condition:
-            result = augmenting_path_v1 (G, m1, priority)
-            m2 = result[0]
+            result = augmenting_path_v1(G, m1, priority)
+            # update the matching
+            m1 = result[0]
             loop_condition = result[1]
-
+        # update the matching
+        m2 = m1
         loop_condition = True
         while loop_condition:
             result = augmenting_path_v2(G, m2, priority)
-            m3 = result[0]
+            # update the matching
+            m2 = result[0]
             loop_condition = result[1]
-
-        update_matching(G,m3)
-
-    matching = []
+        # update the matching
+        m3 = m2
+        # update the matching in G
+        for edge in G.edges:
+            if (edge[0],edge[1]) in m3:
+                nx.set_edge_attributes(G,{edge:{"isMatched": True}})
+            elif (edge[1],edge[0]) in m3:
+                nx.set_edge_attributes(G,{edge:{"isMatched": True}})
+            else:
+                nx.set_edge_attributes(G, {edge: {"isMatched": False}})
+    # The final matching
+    matching = m3
     return matching
 
-
 def augmenting_path_v1 (G:nx.Graph, m1:list, priority:int):
-    capacity_info = nx.get_edge_attributes(G,"capacity")
+    '''
+    "Faster Maximium Priority Matchings in Bipartite Graphs" by Tarjan, Robert E.
+
+    Programmers: Roi Meshulam and Liroy Melamed
+
+    Our augmenting_path_v1 is a private function that gets bipartite graph , curr matching and the curr prioirity and find an augmenting path and increase the matching
+
+    :param G: nx.Graph , m1 : list , prioirity: int
+    :return: A list of edges and bool
+
+    Tests:
+    >>> G = nx.Graph()
+    >>> nodes = ['1', '2', '3', '4', '5', '6']
+    >>> edges = [('1', '2'), ('1', '4'), ('3', '6'),('5', '6')]
+    >>> nodes_attrs = {'1': {"priority": 1, "Group": 1,"isMatched": True},'2': {"priority": 3, "Group": 2,"isMatched": False},'3': {"priority": 2, "Group": 1,"isMatched": False},'4': {"priority": 4, "Group": 2,"isMatched": True},'5': {"priority": 5, "Group": 1,"isMatched": True},'6': {"priority": 6, "Group": 2,"isMatched": True}    }
+    >>> edges_attrs = {('1', '2'): {"isMatched": False ,"flow":0}, ('1', '4'): {"isMatched": True ,"flow":0}, ('3', '6'): {"isMatched": False ,"flow":0},('5','6'):{"isMatched":True ,"flow":0}}
+    >>> G.add_nodes_from(nodes)
+    >>> G.add_edges_from(edges)
+    >>> nx.set_node_attributes(G, nodes_attrs)
+    >>> nx.set_edge_attributes(G, edges_attrs)
+    >>> augmenting_path_v1(G,[('1' , '4'), ('5', '6')],2)
+    ([('1', '4'), ('3', '6')], True)
+
+    '''
+    # reset the flow attr in each edge
+    for edge in G.edges:
+        nx.set_edge_attributes(G, {edge: {'flow': 0}})
     flow_info = nx.get_edge_attributes(G, "flow")
-    print(capacity_info)
-    print(flow_info)
+    m2 = []
+    # if path count is 0 there are no more augmenting paths
     path_count = 0
+    # Temp graph is a direct graph according to the instruction of the algo
     temp_graph = generate_diGraph(G,m1,priority,True)
+    # all the paths from node 's' to node 't'
     paths = nx.all_simple_paths(temp_graph,source='s',target='t')
+    # update path_count
     for path in paths:
         path_count = path_count +1
-    print(path_count)
     # there are no more augmenting paths for V1 Group
     if path_count == 0:
-        return m1
+        return (m1,False)
     # there are more augmenting paths
     else:
+        # take the first path from paths
         paths = nx.all_simple_paths(temp_graph, source='s', target='t')
         temp=[]
         for path in paths:
+            # temp is the path without 's' and 't'
             for i in range (1,len(path)-1):
                 temp.append(path[i])
+            # change all attr "flow" to 1 for each edge in temp_graph that in the path
+            for j in range (0,len(temp)-1):
+                if (temp[j],temp[j+1]) in flow_info:
+                    nx.set_edge_attributes(G, {(temp[j],temp[j+1]): {"flow": 1}})
+                else:
+                    nx.set_edge_attributes(G, {(temp[j+1], temp[j]): {"flow": 1}})
+            #  info
+            flow_info = nx.get_edge_attributes(G, "flow")
+            Group_info = nx.get_node_attributes(G, "Group")
+
+            for edge in G.edges:
+                # update the new matching
+                if Group_info[edge[0]] == 1 and Group_info[edge[1]] == 2:
+                    u = edge[0]
+                    v = edge[1]
+                    if (u,v) in temp_graph.edges and flow_info[(u,v)] == 1:
+                        m2.append((u,v))
+                    if (v,u) in temp_graph.edges and flow_info[(u,v)] == 0:
+                        m2.append((u,v))
+
+                else:
+                    v = edge[0]
+                    u = edge[1]
+
+                    if (u,v) in temp_graph.edges and flow_info[(v,u)] == 1:
+                        m2.append((v,u))
+                    if (v,u) in temp_graph.edges and flow_info[(v,u)] == 0:
+                        m2.append((v,u))
+            # return the new matching and that there are maybe more augmenting paths
+            return (m2,True)
+
+def augmenting_path_v2 (G:nx.Graph, m2:list, priority:int):
+    '''
+     "Faster Maximium Priority Matchings in Bipartite Graphs" by Tarjan, Robert E.
+
+     Programmers: Roi Meshulam and Liroy Melamed
+
+    Our augmenting_path_v2 is a private function that gets bipartite graph , curr matching and the curr prioirity and find an augmenting path and increase the matching
+
+    :param G: nx.Graph , m1 : list , prioirity: int
+    :return: A list of edges and bool
+
+     Tests:
+     >>> G = nx.Graph()
+     >>> nodes = ['1', '2', '3', '4', '5', '6']
+     >>> edges = [('1', '2'), ('1', '4'), ('3', '6'),('5', '6')]
+     >>> nodes_attrs = {'1': {"priority": 1, "Group": 1,"isMatched": True},'2': {"priority": 3, "Group": 2,"isMatched": False},'3': {"priority": 2, "Group": 1,"isMatched": False},'4': {"priority": 4, "Group": 2,"isMatched": True},'5': {"priority": 5, "Group": 1,"isMatched": True},'6': {"priority": 6, "Group": 2,"isMatched": True}    }
+     >>> edges_attrs = {('1', '2'): {"isMatched": False ,"flow":0}, ('1', '4'): {"isMatched": True ,"flow":0}, ('3', '6'): {"isMatched": False ,"flow":0},('5','6'):{"isMatched":True ,"flow":0}}
+     >>> G.add_nodes_from(nodes)
+     >>> G.add_edges_from(edges)
+     >>> nx.set_node_attributes(G, nodes_attrs)
+     >>> nx.set_edge_attributes(G, edges_attrs)
+     >>> augmenting_path_v2(G,[('1' , '4'), ('5', '6')],2)
+     ([('1', '4'), ('5', '6')], False)
+
+     '''
 
 
+    # reset the flow attr in each edge
+    for edge in G.edges:
+        nx.set_edge_attributes(G, {edge: {'flow': 0}})
+    # info
+    flow_info = nx.get_edge_attributes(G, "flow")
+    # the new matching
+    m3 = []
+    # if path count is 0 there are no more augmenting paths
+    path_count = 0
+    # Temp graph is a direct graph according to the instruction of the algo
+    temp_graph = generate_diGraph(G, m2, priority, False)
+    # all the paths from node 's' to node 't'
+    paths = nx.all_simple_paths(temp_graph, source='s', target='t')
+    # update path_count
+    for path in paths:
+        path_count = path_count + 1
+    # there are no more augmenting paths for V1 Group
+    if path_count == 0:
+        return (m2, False)
+    # there are more augmenting paths
+    else:
+        # take the first path from paths
+        paths = nx.all_simple_paths(temp_graph, source='s', target='t')
+        temp = []
+        # temp is the path without 's' and 't'
+        for path in paths:
+            for i in range(1, len(path) - 1):
+                temp.append(path[i])
+            for j in range(0, len(temp) - 1):
+                # change all attr "flow" to 1 for each edge in temp_graph that in the path
+                if (temp[j], temp[j + 1]) in flow_info:
+                    nx.set_edge_attributes(G, {(temp[j], temp[j + 1]): {"flow": 1}})
+                else:
+                    nx.set_edge_attributes(G, {(temp[j + 1], temp[j]): {"flow": 1}})
+           # info
+            flow_info = nx.get_edge_attributes(G, "flow")
+            Group_info = nx.get_node_attributes(G, "Group")
+            # update the new matching
+            for edge in G.edges:
+                if Group_info[edge[0]] == 1 and Group_info[edge[1]] == 2:
+                    u = edge[0]
+                    v = edge[1]
+                    if (u, v) in temp_graph.edges and flow_info[(u, v)] == 1:
+                        m3.append((u, v))
+                    if (v, u) in temp_graph.edges and flow_info[(u, v)] == 0:
+                        m3.append((u, v))
+
+                else:
+                    v = edge[0]
+                    u = edge[1]
+                    if (u, v) in temp_graph.edges and flow_info[(v, u)] == 1:
+                        m3.append((v, u))
+                    if (v, u) in temp_graph.edges and flow_info[(v, u)] == 0:
+                        m3.append((v, u))
+            # return the new matching and that there are maybe more augmenting paths
+            return (m3, True)
 
 def generate_diGraph(G:nx.Graph,m:list,priority:int,flag:bool):
+    '''
+    "Faster Maximium Priority Matchings in Bipartite Graphs" by Tarjan, Robert E.
+
+    Programmers: Roi Meshulam and Liroy Melamed
+
+    Our generate_diGraph is a private function that gets bipartite graph , curr matching ,the curr prioirity and flag and generate a new direct graph according to
+    the algorithm's instructions
+
+    :param G: nx.Graph , m1 : list , prioirity: int
+    :return: A list of edges and bool
+
+     '''
+
+
     ans = nx.DiGraph()
     # info
     priority_info = nx.get_node_attributes(G,"priority")
     Gruop_info = nx.get_node_attributes(G, "Group")
     matching_info =  nx.get_node_attributes(G, "isMatched")
 
-    edge_matching_info= nx.get_edge_attributes(G,"isMatched")
-
-    # print(priority_info)
-    # print(Gruop_info)
-    # print(matching_info)
-    # print(edge_matching_info)
-
     # generate graph for augmenting_path_v1
     if flag is True:
+        # add new nodes 's' and 't' and add edges to the relevant nodes in V1
         ans.add_node('s')
         ans.add_node('t')
         for node in G.nodes:
@@ -1020,57 +1202,76 @@ def generate_diGraph(G:nx.Graph,m:list,priority:int,flag:bool):
             if Gruop_info[node] == 1 and matching_info[node] is True and priority_info[node] > priority:
                 ans.add_edges_from([(node,'t')])
 
-
+        # add the edges from G with the right direction
         for edge in G.edges:
-            if Gruop_info[edge[0]]==1 and Gruop_info[edge[1]]==2:
+            if Gruop_info[edge[0]] == 1 and Gruop_info[edge[1]] == 2:
                 u = edge[0]
                 v = edge[1]
-                if edge_matching_info[edge] is False:
-                    ans.add_edges_from([(u,v)])
-                else:
+
+                if (u,v) in m:
                     ans.add_edges_from([(v, u)])
+                elif (v,u) in m:
+                    ans.add_edges_from([(v, u)])
+                # {u,v} is not a matching edge
+                else:
+                    ans.add_edges_from([(u, v)])
+
             else:
                 v = edge[0]
                 u = edge[1]
 
-                if edge_matching_info[edge] is False:
-                    ans.add_edges_from([(u, v)])
-                else:
+                if (u, v) in m:
                     ans.add_edges_from([(v, u)])
-
+                elif (v, u) in m:
+                    ans.add_edges_from([(v, u)])
+                    # {u,v} is not a matching edge
+                else:
+                    ans.add_edges_from([(u, v)])
 
         return ans
 
+    # flag is false , generate graph for augmenting_path_v2
     else:
+        # add new nodes 's' and 't' and add edges to the relevant nodes in V2
+        ans.add_node('s')
+        ans.add_node('t')
+        for node in G.nodes:
+            ans.add_node(node)
+            if Gruop_info[node] == 2 and matching_info[node] is True and priority_info[node] > priority:
+                ans.add_edges_from([('s', node)])
+            if Gruop_info[node] == 2 and matching_info[node] is False and priority_info[node] == priority:
+                ans.add_edges_from([(node, 't')])
+        # add the edges from G with the right direction
+        for edge in G.edges:
+            if Gruop_info[edge[0]] == 1 and Gruop_info[edge[1]] == 2:
+                u = edge[0]
+                v = edge[1]
+
+                if (u,v) in m:
+                    ans.add_edges_from([(v,u)])
+                elif (v,u) in m:
+                    ans.add_edges_from([(v, u)])
+                else:
+                    ans.add_edges_from([(u,v)])
+
+            else:
+                v = edge[0]
+                u = edge[1]
+
+                if (u,v) in m:
+                    ans.add_edges_from([(v,u)])
+                elif (v,u) in m:
+                    ans.add_edges_from([(v, u)])
+                else:
+                    ans.add_edges_from([(u,v)])
+
+
+
         return ans
+
+
 
 if __name__ == '__main__':
     doctest.testmod()
-
-    G = nx.Graph()
-    nodes = ['1', '2', '3', '4', '5', '6']
-    edges = [('1', '2'), ('1', '4'), ('3', '6'),('5', '6')]
-    nodes_attrs = {'1': {"priority": 1, "Group": 1,"isMatched": True},
-                   '2': {"priority": 3, "Group": 2,"isMatched": False},
-                   '3': {"priority": 2, "Group": 1,"isMatched": False},
-                   '4': {"priority": 4, "Group": 2,"isMatched": True},
-                   '5': {"priority": 5, "Group": 1,"isMatched": True},
-                   '6': {"priority": 6, "Group": 2,"isMatched": True}
-                   }
-    edges_attrs = {('1', '2'): {"isMatched": False ,"capacity": 1,"flow":0}, ('1', '4'): {"isMatched": True,"capacity": 1 ,"flow":0}, ('3', '6'): {"isMatched": False,"capacity": 1 ,"flow":0},('5','6'):{"isMatched":True,"capacity": 1 ,"flow":0}}
-
-
-
-    G.add_nodes_from(nodes)
-    G.add_edges_from(edges)
-    nx.set_node_attributes(G, nodes_attrs)
-    nx.set_edge_attributes(G, edges_attrs)
-    # matching = find_maximum_priority_matching_bipartite(G)
-
-    # ans = generate_diGraph(G,[],2,True)
-    # print(ans)
-    # print(ans.nodes)
-    # print(ans.edges)
-    augmenting_path_v1(G, [], 2)
 
 
