@@ -175,13 +175,13 @@ def find_augmenting_paths(G: nx.Graph, Priority: int):
 
     # preparation for the algorithm
     preparation = prepare_for_algo(G,Priority)
-    roots = preparation[0]
+    roots = preparation[1]
     # if there are no more roots so we can proceed to the next priority
     if len(roots) == 0:
         # print("No relevant roots")
         return False
 
-    eligible_edges = preparation[1]
+    eligible_edges = preparation[0]
     while eligible_edges:
         # print("eligible edges before pop")
         # print(eligible_edges)
@@ -1451,4 +1451,5 @@ def generate_diGraph(G:nx.Graph,m:list,priority:int,flag:bool):
 
 if __name__ == '__main__':
     print(doctest.testmod())
+
 

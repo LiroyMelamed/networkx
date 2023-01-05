@@ -3,11 +3,13 @@ cimport cython
 
 @cython.cdivision(True)
 cpdef prepare_for_algo(G: nx.Graph, int Priority):
+
     cdef list roots = []
     cdef list eligible_edges = []
 
     cdef dict nodes_priorities = nx.get_node_attributes(G, 'priority')
     cdef dict nodes_matching = nx.get_node_attributes(G, 'isMatched')
+
 
     for node in G.nodes:
         check_node = str(node)
@@ -23,3 +25,4 @@ cpdef prepare_for_algo(G: nx.Graph, int Priority):
             eligible_edges.append(edge)
 
     return eligible_edges ,roots
+
