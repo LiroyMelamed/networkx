@@ -1,0 +1,84 @@
+INFO:root:Find maximal matching for G {('8', '9'), ('5', '7'), ('3', '4'), ('1', '2'), ('10', '11')}
+INFO:root:Searching for augmenting paths for prioirity 1
+INFO:root:Current roots: ['6', '12']
+INFO:root:Current eligible edges: [('6', '3'), ('6', '7'), ('12', '10'), ('12', '11')]
+INFO:root:Selected edge: ('6', '3')
+INFO:root:u : 6
+INFO:root:v : 3
+INFO:root:B(v) is positive : False
+INFO:root:B(v) and B(u) are in the same tree : False
+INFO:root:First condition
+INFO:root:It is not an augmenting path, add all incident edges to node 4 to eligible edges
+INFO:root:Current eligible edges: [('6', '7'), ('12', '10'), ('12', '11'), ('4', '5')]
+INFO:root:Selected edge: ('6', '7')
+INFO:root:u : 6
+INFO:root:v : 7
+INFO:root:B(v) is positive : False
+INFO:root:B(v) and B(u) are in the same tree : False
+INFO:root:First condition
+INFO:root:It is not an augmenting path, add all incident edges to node 5 to eligible edges
+INFO:root:Current eligible edges: [('12', '10'), ('12', '11'), ('4', '5')]
+INFO:root:Selected edge: ('12', '10')
+INFO:root:u : 12
+INFO:root:v : 10
+INFO:root:B(v) is positive : False
+INFO:root:B(v) and B(u) are in the same tree : False
+INFO:root:First condition
+INFO:root:It is not an augmenting path, add all incident edges to node 11 to eligible edges
+INFO:root:Current eligible edges: [('12', '11'), ('4', '5'), ('11', '7')]
+INFO:root:Selected edge: ('12', '11')
+INFO:root:u : 12
+INFO:root:v : 11
+INFO:root:B(v) is positive : True
+INFO:root:B(v) and B(u) are in the same tree : True
+INFO:root:Fourth condition
+INFO:root:Find blossom
+INFO:root:blossom_key: B0
+INFO:root:{'nodes': ['12', '10', '11'], 'root': '12', 'isPositive': True, 'Base': '12'}
+INFO:root:There isn't an augmenting path yet, add all incident edges to the odds nodes in the blossom
+INFO:root:shrink_blossom and continue to next edge in eligeble edges
+INFO:root:Current eligible edges: [('4', '5'), ('11', '7'), ('10', '9')]
+INFO:root:Selected edge: ('4', '5')
+INFO:root:u : 4
+INFO:root:v : 5
+INFO:root:B(v) is positive : True
+INFO:root:B(v) and B(u) are in the same tree : True
+INFO:root:Fourth condition
+INFO:root:Find blossom
+INFO:root:blossom_key: B1
+INFO:root:{'nodes': ['4', '3', '6', '7', '5'], 'root': '6', 'isPositive': True, 'Base': '6'}
+INFO:root:There isn't an augmenting path yet, add all incident edges to the odds nodes in the blossom
+INFO:root:shrink_blossom and continue to next edge in eligeble edges
+INFO:root:Current eligible edges: [('11', '7'), ('10', '9'), ('3', '2')]
+INFO:root:Selected edge: ('11', '7')
+INFO:root:u : 11
+INFO:root:v : 7
+INFO:root:B(v) is positive : True
+INFO:root:B(v) and B(u) are in the same tree : False
+INFO:root:Third condition
+INFO:root:There is an augmenting path
+INFO:root:['12', '10', '11', '7', '5', '4', '3', '6']
+INFO:root:update the augemnting path in the Graph and try to find more for priority 1
+INFO:root:There are no more augmenting paths for prioirity 1
+INFO:root:Searching for augmenting paths for prioirity 2
+INFO:root:There are no more augmenting paths for prioirity 2
+INFO:root:Searching for augmenting paths for prioirity 3
+INFO:root:There are no more augmenting paths for prioirity 3
+INFO:root:Searching for augmenting paths for prioirity 4
+INFO:root:There are no more augmenting paths for prioirity 4
+INFO:root:Searching for augmenting paths for prioirity 5
+INFO:root:There are no more augmenting paths for prioirity 5
+INFO:root:Searching for augmenting paths for prioirity 6
+INFO:root:There are no more augmenting paths for prioirity 6
+INFO:root:Searching for augmenting paths for prioirity 7
+INFO:root:There are no more augmenting paths for prioirity 7
+INFO:root:Searching for augmenting paths for prioirity 8
+INFO:root:There are no more augmenting paths for prioirity 8
+INFO:root:Searching for augmenting paths for prioirity 9
+INFO:root:There are no more augmenting paths for prioirity 9
+INFO:root:Searching for augmenting paths for prioirity 10
+INFO:root:There are no more augmenting paths for prioirity 10
+INFO:root:Searching for augmenting paths for prioirity 11
+INFO:root:There are no more augmenting paths for prioirity 11
+INFO:root:Searching for augmenting paths for prioirity 12
+INFO:root:There are no more augmenting paths for prioirity 12
