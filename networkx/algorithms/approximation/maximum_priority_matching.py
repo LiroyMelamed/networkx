@@ -29,13 +29,11 @@ def find_priority_score(G: nx.Graph):
     # Test with a graph that has no matching edges
     >>> G = nx.Graph()
     >>> nodes=['1','2','3','4','5','6','7','8','9']
-    >>> edges = [('1', '2'), ('2', '3'), ('3', '4'), ('4', '5'), ('5', '6'), ('6', '7'), ('7', '8'), ('7', '9'),('7','3')]
-    >>> nodes_attrs = {'1': {"parent": None, "priority":1 ,"isMatched": False, "isPositive":False, "isReachable": False,"root":None,"isBolssom":False,"isExternal":True,"blossomsID":-1},'2': {"parent": None, "priority":8 ,"isMatched": False , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},'3': {"parent": None, "priority":6 ,"isMatched": False , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},'4': {"parent": None, "priority":5 ,"isMatched": False , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},'5': {"parent": None, "priority":2 ,"isMatched": False , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},'6': {"parent": None, "priority":4 ,"isMatched": False , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},'7': {"parent": None, "priority":3 ,"isMatched": False , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},'8': {"parent": None, "priority":1 ,"isMatched": False, "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},'9': {"parent": None, "priority":7 ,"isMatched": False, "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1}}
-    >>> edges_attrs ={('1', '2'): {"isMatched": False},('2', '3'): {"isMatched": False},('3', '4'): {"isMatched": False},('4', '5'): {"isMatched": False}, ('5', '6'): {"isMatched": False},('6', '7'): {"isMatched": False},('7', '3'): {"isMatched": False},('7', '8'): {"isMatched": False},('7', '9'): {"isMatched": False}}
+    >>> edges = []
+    >>> nodes_attrs = {'1': {"priority":1},'2': {"priority":8},'3': {"priority":6},'4': {"priority":5},'5': {"priority":2},'6': {"priority":4},'7': {"priority":3},'8': {"priority":1},'9': {"priority":7}}
     >>> G.add_nodes_from(nodes)
     >>> G.add_edges_from(edges)
     >>> nx.set_node_attributes(G, nodes_attrs)
-    >>> nx.set_edge_attributes(G,edges_attrs)
     >>> find_priority_score(G)
     '000000000'
 
@@ -43,34 +41,36 @@ def find_priority_score(G: nx.Graph):
     >>> G = nx.Graph()
     >>> nodes=['1','2','3','4','5','6','7','8','9']
     >>> edges = [('1', '2'), ('2', '3'), ('3', '4'), ('4', '5'), ('5', '6'), ('6', '7'), ('7', '8'), ('7', '9'),('7','3')]
-    >>> nodes_attrs = {'1': {"parent": None, "priority":1 ,"isMatched": True, "isPositive":False, "isReachable": False,"root":None,"isBolssom":False,"isExternal":True,"blossomsID":-1},'2': {"parent": None, "priority":8 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},'3': {"parent": None, "priority":6 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},'4': {"parent": None, "priority":5 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},'5': {"parent": None, "priority":2 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},'6': {"parent": None, "priority":4 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},'7': {"parent": None, "priority":3 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},'8': {"parent": None, "priority":1 ,"isMatched": True, "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},'9': {"parent": None, "priority":7 ,"isMatched": True, "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1}}
-    >>> edges_attrs ={('1', '2'): {"isMatched": True},('2', '3'): {"isMatched": True},('3', '4'): {"isMatched": True},('4', '5'): {"isMatched": True}, ('5', '6'): {"isMatched": True},('6', '7'): {"isMatched": True},('7', '3'): {"isMatched": True},('7', '8'): {"isMatched": True},('7', '9'): {"isMatched": True}}
+    >>> nodes_attrs = {'1': {"priority":1},'2': {"priority":8},'3': {"priority":6},'4': {"priority":5},'5': {"priority":2},'6': {"priority":4},'7': {"priority":3},'8': {"priority":1},'9': {"priority":7}}
     >>> G.add_nodes_from(nodes)
     >>> G.add_edges_from(edges)
     >>> nx.set_node_attributes(G, nodes_attrs)
-    >>> nx.set_edge_attributes(G,edges_attrs)
     >>> find_priority_score(G)
-    '211111110'
+    '211111010'
 
-    # Test with a graph that has a mix of matching and non-matching edges
-    >>> G = nx.Graph()
-    >>> nodes=['1','2','3','4','5','6','7','8','9']
-    >>> edges = [('1', '2'), ('2', '3'), ('3', '4'), ('4', '5'), ('5', '6'), ('6', '7'), ('7', '8'), ('7', '9'),('7','3')]
-    >>> nodes_attrs = {'1': {"parent": None, "priority":1 ,"isMatched": True, "isPositive":False, "isReachable": False,"root":None,"isBolssom":False,"isExternal":True,"blossomsID":-1},'2': {"parent": None, "priority":8 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},'3': {"parent": None, "priority":6 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},'4': {"parent": None, "priority":5 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},'5': {"parent": None, "priority":2 ,"isMatched": False , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},'6': {"parent": None, "priority":4 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},'7': {"parent": None, "priority":3 ,"isMatched": True , "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},'8': {"parent": None, "priority":1 ,"isMatched": True, "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1},'9': {"parent": None, "priority":7 ,"isMatched": False, "isPositive":False, "isReachable": False,"root":None,"isBolssom":False, "isExternal":True,"blossomsID":-1}}
-    >>> edges_attrs ={('1', '2'): {"isMatched": True},('2', '3'): {"isMatched": False},('3', '4'): {"isMatched": True},('4', '5'): {"isMatched": False}, ('5', '6'): {"isMatched": True},('6', '7'): {"isMatched": False},('7', '3'): {"isMatched": False},('7', '8'): {"isMatched": True},('7', '9'): {"isMatched": False}}
-    >>> G.add_nodes_from(nodes)
-    >>> G.add_edges_from(edges)
-    >>> nx.set_node_attributes(G, nodes_attrs)
-    >>> nx.set_edge_attributes(G,edges_attrs)
-    >>> find_priority_score(G)
-    '201111010'
+   
 
     '''
+    #  n-ary
     temp = [0]
     priority_size = G.number_of_nodes()
     score_list = temp * priority_size
+    # find the maximum prioirty matching
+    matching = find_maximum_priority_matching(G)
+    # inilize all node attr (ismatched) to false
+    for node in G.nodes:
+        nx.set_node_attributes(G,{node: {"isMatched": False}})
+
+    # if node touch the matching change nodes' attr to true
+    for element in matching:
+        nx.set_node_attributes(G,{element[0]:{"isMatched":True}})
+        nx.set_node_attributes(G,{element[1]:{"isMatched":True}})
+        
+
+   
     matching_info = nx.get_node_attributes(G,'isMatched')
     priority_info = nx.get_node_attributes(G,'priority')
+    # update the score
     for node in G.nodes:
         if matching_info[node] is True:
             score_list[priority_info[node]-1] = score_list[priority_info[node]-1] + 1
